@@ -16,7 +16,12 @@ int main()
     int c[arraySize] = { 0 };
     AddWithCudaFunc addWithCuda = (AddWithCudaFunc)GetProcAddress(hDll, "addWithCuda");
     addWithCuda(c, a, b, arraySize);
-    
+    for (int i = 0; i < arraySize;i++)
+    {
+        std::cout << c[i] << " ";
+    }
+    std::cout << std::endl;
+
     if (addWithCuda == NULL) 
     {
         return 1;
