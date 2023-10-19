@@ -15,6 +15,10 @@ int main()
     const int b[arraySize] = { 10, 20, 30, 40, 50 };
     int c[arraySize] = { 0 };
     AddWithCudaFunc addWithCuda = (AddWithCudaFunc)GetProcAddress(hDll, "addWithCuda");
+    CreateNeuralNetwork createNeuralNetwork = (CreateNeuralNetwork)GetProcAddress(hDll, "createNeuralNetwork");
+    NeuralNetworkData nnd{};
+    nnd.nb_input_layer = 50;
+    createNeuralNetwork(nnd);
     addWithCuda(c, a, b, arraySize);
     for (int i = 0; i < arraySize;i++)
     {

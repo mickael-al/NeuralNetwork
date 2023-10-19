@@ -10,8 +10,90 @@ int main()
     return 0;
 }
 
-NeuralNetwork* createNeuralNetwork()
+
+__global__ void InitNeuralNetwork(const NeuralNetworkData * nnd,const NeuralSwapData * nld, float* weight_buffer)
 {
+    int i = threadIdx.x;
+    if (i >= nld->size)
+    {
+        return;
+    }
+    weight_buffer[i] = 0.0f;
+}
+
+NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
+{
+    NeuralSwapData nld{};
+    nnd.activationSize = nnd.nb_input_layer + nnd.nb_col_hiden_layer * nnd.nb_hiden_layer + nnd.nb_output_layer;
+    nnd.weightSize = nnd.nb_input_layer * nnd.nb_hiden_layer;
+    for (int i = 0; i < nnd.nb_col_hiden_layer - 1; i++)
+    {
+        nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_hiden_layer;
+    }
+    nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_output_layer;
+    int layerStep = 2 + nnd.nb_col_hiden_layer;
+    nld.size = nnd.weightSize;
+    float* weight_buffer = 0;
+    float * activation_Buffer = 0;
+    NeuralNetworkData* nnd_Buffer = 0;
+    NeuralSwapData* nld_Buffer = 0;
+    cudaError_t cudaStatus;
+
+    cudaStatus = cudaSetDevice(0);
+    if (cudaStatus != cudaSuccess)
+    {
+        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+        goto Error;
+    }
+    cudaStatus = cudaMalloc((void**)&weight_buffer, nnd.weightSize * sizeof(float));
+    if (cudaStatus != cudaSuccess)
+    {
+        fprintf(stderr, "cudaMalloc failed!");
+        goto Error;
+    }
+
+    cudaStatus = cudaMalloc((void**)&activation_Buffer, nnd.activationSize * sizeof(float));
+    if (cudaStatus != cudaSuccess)
+    {
+        fprintf(stderr, "cudaMalloc failed!");
+        goto Error;
+    }
+
+    cudaStatus = cudaMalloc((void**)&nnd_Buffer, sizeof(NeuralNetworkData));
+    if (cudaStatus != cudaSuccess)
+    {
+        fprintf(stderr, "cudaMalloc failed!");
+        goto Error;
+    }
+
+    cudaStatus = cudaMalloc((void**)&nld_Buffer, sizeof(NeuralSwapData));
+    if (cudaStatus != cudaSuccess)
+    {
+        fprintf(stderr, "cudaMalloc failed!");
+        goto Error;
+    }
+
+    cudaStatus = cudaMemcpy(nnd_Buffer, &nnd, sizeof(NeuralNetworkData), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess)
+    {
+        fprintf(stderr, "cudaMemcpy failed!");
+        goto Error;
+    }
+
+    cudaStatus = cudaMemcpy(nld_Buffer, &nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess)
+    {
+        fprintf(stderr, "cudaMemcpy failed!");
+        goto Error;
+    }
+
+
+Error:
+    cudaFree(weight_buffer);
+    cudaFree(activation_Buffer);
+    cudaFree(nnd_Buffer);
+    cudaFree(nld_Buffer);
+
     return nullptr;
 }
 
