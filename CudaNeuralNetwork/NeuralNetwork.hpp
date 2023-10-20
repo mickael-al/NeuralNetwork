@@ -28,12 +28,12 @@ class NeuralNetwork
 {
 public:
     //NeuralNetwork(int input,int c);
-    void loadModel(const std::string& modelPath);
+    /*void loadModel(const std::string& modelPath);
     void setInputData(const std::vector<double>& inputData);
     void saveModel(const std::string& modelPath);
     void Propagate();
     void BackPropagate();
-    std::vector<double> predict();    
+    std::vector<double> predict();    */
 };
 
 #endif //!__NEURAL_NETWORK__

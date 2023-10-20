@@ -17,8 +17,11 @@ int main()
     AddWithCudaFunc addWithCuda = (AddWithCudaFunc)GetProcAddress(hDll, "addWithCuda");
     CreateNeuralNetwork createNeuralNetwork = (CreateNeuralNetwork)GetProcAddress(hDll, "createNeuralNetwork");
     NeuralNetworkData nnd{};
-    nnd.nb_input_layer = 50;
-    createNeuralNetwork(nnd);
+    nnd.nb_input_layer = 2;
+    nnd.nb_col_hiden_layer = 4;
+    nnd.nb_hiden_layer = 4;
+    nnd.nb_output_layer = 1;
+    NeuralNetwork * nn = createNeuralNetwork(nnd);    
     addWithCuda(c, a, b, arraySize);
     for (int i = 0; i < arraySize;i++)
     {

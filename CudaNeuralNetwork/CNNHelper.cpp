@@ -1,7 +1,16 @@
 #include "CNNHelper.hpp"
 
-void CNNHelper::KernelDispath(int size, int deviceLimitBlockSize, int* numBlocks, int* blockSize)
+void CNNHelper::KernelDispath(int size, cudaDeviceProp * deviceProp, dim3* numBlocks, dim3* blockSize)
 {
-    *numBlocks = (size + deviceLimitBlockSize - 1) / deviceLimitBlockSize;
-    *blockSize = std::min(deviceLimitBlockSize, size);
+    numBlocks->x = (size + deviceProp->maxThreadsPerBlock - 1) / deviceProp->maxThreadsPerBlock;
+    numBlocks->y = 1;
+    numBlocks->z = 1;
+    blockSize->x = std::min(deviceProp->maxThreadsPerBlock, size);
+    blockSize->y = 1;
+    blockSize->z = 1;
+}
+
+void CNNHelper::KernelDispathDim3(dim3 size,cudaDeviceProp* deviceProp, dim3* numBlocks, dim3* blockSize)
+{
+  
 }
