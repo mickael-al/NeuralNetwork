@@ -1,221 +1,223 @@
 ﻿  Compiling CUDA source file kernel.cu...
   
-  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "D:\Program Files\MVS2022\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include"  -G   --keep-dir x64\Debug  -maxrregcount=0   --machine 64 --compile -cudart static  -g  -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -Xcompiler "/Fdx64\Debug\vc143.pdb" -o D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\x64\Debug\kernel.cu.obj "D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu" 
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(50): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\bin\nvcc.exe" -gencode=arch=compute_52,code=\"sm_52,compute_52\" --use-local-env -ccbin "D:\Program Files\MVS2022\VC\Tools\MSVC\14.36.32532\bin\HostX64\x64" -x cu   -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\include"  -G   --keep-dir x64\Debug  -maxrregcount=0   --machine 64 --compile -cudart static  -g  -DWIN32 -DWIN64 -D_DEBUG -D_CONSOLE -DBUILD_DLL -D_WINDLL -D_MBCS -Xcompiler "/EHsc /W3 /nologo /Od /FS /Zi /RTC1 /MDd " -Xcompiler "/Fdx64\Debug\vc143.pdb" -o D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\x64\Debug\kernel.cu.obj "D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu" 
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(51): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
   Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(60): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(61): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(67): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(68): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(74): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(75): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(81): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(82): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(88): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(89): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(95): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(96): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(155): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(156): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(164): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(165): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(171): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(172): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(178): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(179): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(185): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(186): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(192): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(193): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(199): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(200): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(206): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(207): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(213): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(214): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(50): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(51): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
   Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(60): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(61): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(67): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(68): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(74): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(75): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(81): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(82): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(88): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(89): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(95): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 97)
-              variable "dimBlock" (declared at line 98)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(96): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 98)
+              variable "dimBlock" (declared at line 99)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(38): warning #177-D: variable "layerStep" was declared but never referenced
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(39): warning #177-D: variable "layerStep" was declared but never referenced
         int layerStep = 2 + nnd.nb_col_hiden_layer;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(155): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(156): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(164): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(165): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(171): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(172): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(178): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(179): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(185): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(186): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(192): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(193): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(199): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(200): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(206): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(207): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(213): warning #546-D: transfer of control bypasses initialization of:
-              variable "dimGrid" (declared at line 216)
-              variable "dimBlock" (declared at line 217)
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(214): warning #546-D: transfer of control bypasses initialization of:
+              variable "dimGrid" (declared at line 217)
+              variable "dimBlock" (declared at line 218)
             goto Error;
             ^
   
   kernel.cu
-  tmpxft_000049d8_00000000-7_kernel.cudafe1.cpp
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(98): warning C4533: L'initialisation de 'dimBlock' est ignorée par 'goto Error'.
-  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(98): note: voir la déclaration de 'dimBlock'
-  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(119): note: voir la déclaration de 'Error'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(97): warning C4533: L'initialisation de 'dimGrid' est ignorée par 'goto Error'.
-  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(97): note: voir la déclaration de 'dimGrid'
-  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(119): note: voir la déclaration de 'Error'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(217): warning C4533: L'initialisation de 'dimBlock' est ignorée par 'goto Error'.
-  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(217): note: voir la déclaration de 'dimBlock'
-  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(243): note: voir la déclaration de 'Error'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(216): warning C4533: L'initialisation de 'dimGrid' est ignorée par 'goto Error'.
-  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(216): note: voir la déclaration de 'dimGrid'
-  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(243): note: voir la déclaration de 'Error'
+  tmpxft_000040a8_00000000-7_kernel.cudafe1.cpp
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(99): warning C4533: L'initialisation de 'dimBlock' est ignorée par 'goto Error'.
+  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(99): note: voir la déclaration de 'dimBlock'
+  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(120): note: voir la déclaration de 'Error'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(98): warning C4533: L'initialisation de 'dimGrid' est ignorée par 'goto Error'.
+  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(98): note: voir la déclaration de 'dimGrid'
+  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(120): note: voir la déclaration de 'Error'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(218): warning C4533: L'initialisation de 'dimBlock' est ignorée par 'goto Error'.
+  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(218): note: voir la déclaration de 'dimBlock'
+  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(244): note: voir la déclaration de 'Error'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(217): warning C4533: L'initialisation de 'dimGrid' est ignorée par 'goto Error'.
+  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(217): note: voir la déclaration de 'dimGrid'
+  D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\kernel.cu(244): note: voir la déclaration de 'Error'
+  CNNHelper.cpp
   NeuralNetwork.cpp
+  Génération de code en cours...
      Création de la bibliothèque D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\CudaNeuralNetwork.lib et de l'objet D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\CudaNeuralNetwork.exp
 LINK : warning LNK4098: conflit entre la bibliothèque par défaut 'LIBCMT' et les autres bibliothèques ; utilisez /NODEFAULTLIB:library
   CudaNeuralNetwork.vcxproj -> D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\CudaNeuralNetwork.dll

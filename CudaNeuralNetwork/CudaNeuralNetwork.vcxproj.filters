@@ -23,7 +23,18 @@
     <ClInclude Include="CNNHelper.hpp">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="NeuralNetwork.hpp" />
+    <ClInclude Include="NeuralNetworkData.hpp">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetwork.hpp">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralSwapData.hpp">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="export.hpp">
+      <Filter>Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="kernel.cu">

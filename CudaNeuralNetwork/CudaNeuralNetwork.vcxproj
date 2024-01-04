@@ -23,7 +23,7 @@
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -47,7 +47,8 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_CONSOLE;BUILD_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -83,8 +84,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CNNHelper.hpp" />
+    <ClInclude Include="export.hpp" />
     <ClInclude Include="kernel.h" />
     <ClInclude Include="NeuralNetwork.hpp" />
+    <ClInclude Include="NeuralNetworkData.hpp" />
+    <ClInclude Include="NeuralSwapData.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

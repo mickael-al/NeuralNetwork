@@ -5,8 +5,9 @@
 #include <curand_kernel.h>
 #include "CNNHelper.hpp"
 #include <stdio.h>
+#include "NeuralNetwork.hpp"
 
-__global__ void InitNeuralNetwork(const NeuralNetworkData * nnd,const NeuralSwapData * nld, float* weight_buffer)
+__global__ void InitNeuralNetwork(const NeuralSwapData * nld, float* weight_buffer)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
     if (i >= nld->size)
@@ -98,7 +99,7 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
     dim3 dimBlock;
     
     CNNHelper::KernelDispath(nld.size, &deviceProp, &dimGrid, &dimBlock);
-    InitNeuralNetwork<<<dimGrid, dimBlock >>>(nnd_Buffer, nld_Buffer, weight_buffer);
+    InitNeuralNetwork<<<dimGrid, dimBlock>>>(nld_Buffer, weight_buffer);
 
     cudaStatus = cudaGetLastError();
     if (cudaStatus != cudaSuccess)
@@ -114,7 +115,7 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
         goto Error;
     }
 
-    return new NeuralNetwork();
+    return new NeuralNetwork(weight_buffer, activation_Buffer, nnd_Buffer, nld_Buffer);
 
 Error:
     cudaFree(weight_buffer);
@@ -127,7 +128,7 @@ Error:
 
 void releaseNeuralNetwork(NeuralNetwork* network)
 {
-
+    delete network;
 }
 
 __global__ void addKernel(int* c, const int* a, const int* b,const int * size)

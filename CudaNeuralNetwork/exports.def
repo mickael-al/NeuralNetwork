@@ -2,3 +2,4 @@ LIBRARY CudaNeuralNetwork
 EXPORTS
     addWithCuda
     createNeuralNetwork
+    releaseNeuralNetwork
