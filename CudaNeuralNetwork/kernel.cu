@@ -40,6 +40,7 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
     nld.size = nnd.weightSize;
     float * weight_buffer = 0;
     float * activation_Buffer = 0;
+    float * result_Buffer = 0;
     NeuralNetworkData* nnd_Buffer = 0;
     NeuralSwapData* nld_Buffer = 0;
     cudaError_t cudaStatus;
@@ -62,6 +63,13 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
     }
 
     cudaStatus = cudaMalloc((void**)&activation_Buffer, nnd.activationSize * sizeof(float));
+    if (cudaStatus != cudaSuccess)
+    {
+        fprintf(stderr, "cudaMalloc failed!");
+        goto Error;
+    }
+
+    cudaStatus = cudaMalloc((void**)&result_Buffer, nnd.nb_output_layer * sizeof(float));
     if (cudaStatus != cudaSuccess)
     {
         fprintf(stderr, "cudaMalloc failed!");
@@ -117,11 +125,12 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
 
     std::cout << nnd.weightSize << " " << nnd.activationSize << std::endl;
 
-    return new NeuralNetwork(weight_buffer, activation_Buffer, nnd_Buffer, nld_Buffer);
+    return new NeuralNetwork(weight_buffer, activation_Buffer, result_Buffer, nnd_Buffer, nld_Buffer);
 
 Error:
     cudaFree(weight_buffer);
     cudaFree(activation_Buffer);
+    cudaFree(result_Buffer);
     cudaFree(nnd_Buffer);
     cudaFree(nld_Buffer);
 

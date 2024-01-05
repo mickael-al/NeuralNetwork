@@ -21,6 +21,14 @@ __device__ float Tanh(float x)
 	}
 }
 
+__device__ float TanhDerive(float x)
+{
+	
+	float tan = Tanh(x);
+	return 1.0 - tan * tan;
+	
+}
+
 __global__ void PropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, const float* weight_buffer, float* activation_Buffer)
 {
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -64,18 +72,32 @@ __global__ void PropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, cons
 	}
 }
 
-NeuralNetwork::NeuralNetwork(float* weight_buffer, float* activation_Buffer, NeuralNetworkData* nnd_Buffer, NeuralSwapData* nld_Buffer)
+__global__ void BackPropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, const float* weight_buffer, float* activation_Buffer, float* result_Buffer)
+{
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index >= nld->size)
+	{
+		return;
+	}
+	
+
+}
+
+NeuralNetwork::NeuralNetwork(float* weight_buffer, float* activation_Buffer, float* result_Buffer, NeuralNetworkData* nnd_Buffer, NeuralSwapData* nld_Buffer, NeuralNetworkData nnd)
 {
 	m_weight_buffer = weight_buffer;
 	m_activation_Buffer = activation_Buffer;
+	m_result_Buffer = result_Buffer;
 	m_nnd_Buffer = nnd_Buffer;
 	m_nld_Buffer = nld_Buffer;
+	m_nnd = nnd;
 }
 
 NeuralNetwork::~NeuralNetwork()
 {
 	cudaFree(m_weight_buffer);
 	cudaFree(m_activation_Buffer);
+	cudaFree(m_result_Buffer);
 	cudaFree(m_nnd_Buffer);
 	cudaFree(m_nld_Buffer);
 }
@@ -109,7 +131,6 @@ void NeuralNetwork::propagate()
 	cudaDeviceProp deviceProp;
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
 
-
 	int layerStep = 2 + m_nnd_Buffer->nb_col_hiden_layer;
 	m_nld_Buffer->size = m_nnd_Buffer->activationSize;
 	dim3 dimGrid;
@@ -123,7 +144,36 @@ void NeuralNetwork::propagate()
 	}
 }
 
-void NeuralNetwork::backPropagate()
+void NeuralNetwork::backPropagate(std::vector<float> prediction_Data)
 {
+	std::cout << "BackPropagate" << std::endl;
+	cudaError_t cudaStatus;
+	cudaStatus = cudaSetDevice(0);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+		return;
+	}
 
+	cudaDeviceProp deviceProp;
+	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
+
+	cudaStatus = cudaMemcpy(result_Buffer, &prediction_Data.data, sizeof(float)*m_nnd.nb_output_layer, cudaMemcpyHostToDevice);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr, "cudaMemcpy failed!");
+		goto Error;
+	}
+
+	int layerStep = 2 + m_nnd_Buffer->nb_col_hiden_layer;
+	m_nld_Buffer->size = m_nnd_Buffer->activationSize;
+	dim3 dimGrid;
+	dim3 dimBlock;
+
+	CNNHelper::KernelDispath(m_nld_Buffer->size, &deviceProp, &dimGrid, &dimBlock);
+	for (int i = 0; i < layerStep - 1; i++)
+	{
+		m_nld_Buffer->layerId = i + 1;
+		//PropagateNeuralNetwork<<<dimGrid, dimBlock>>>(m_nnd_Buffer, m_nld_Buffer, m_weight_buffer, m_activation_Buffer);
+	}
 }
