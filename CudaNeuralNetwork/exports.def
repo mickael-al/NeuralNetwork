@@ -3,3 +3,4 @@ EXPORTS
     addWithCuda
     createNeuralNetwork
     releaseNeuralNetwork
+    trainingNeuralNetwork

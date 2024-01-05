@@ -1,6 +1,6 @@
 #include <iostream>
 #include <Windows.h>
-#include "kernel.h"
+#include "CudaNeuralNetwork.hpp"
 
 int main()
 {
@@ -30,6 +30,7 @@ int main()
     
     CreateNeuralNetwork createNeuralNetwork = (CreateNeuralNetwork)GetProcAddress(hDll, "createNeuralNetwork");
     ReleaseNeuralNetwork releaseNeuralNetwork = (ReleaseNeuralNetwork)GetProcAddress(hDll, "releaseNeuralNetwork");
+    TrainingNeuralNetwork trainingNeuralNetwork = (TrainingNeuralNetwork)GetProcAddress(hDll, "trainingNeuralNetwork");
     if (createNeuralNetwork == NULL)
     {
         std::cerr << "createNeuralNetwork not found" << std::endl;
@@ -44,9 +45,11 @@ int main()
     nnd.nb_input_layer = 2;
     nnd.nb_col_hiden_layer = 4;
     nnd.nb_hiden_layer = 4;
-    nnd.nb_output_layer = 2;
-    NeuralNetwork * nn = createNeuralNetwork(nnd);    
+    nnd.nb_output_layer = 1;
+    nnd.mutation_multiplayer = 0.1f;
+    NeuralNetwork * nn = createNeuralNetwork(nnd);        
     const std::string modelPath = "test";
+    trainingNeuralNetwork(nn, modelPath);
     releaseNeuralNetwork(nn);
     return 0;
 }

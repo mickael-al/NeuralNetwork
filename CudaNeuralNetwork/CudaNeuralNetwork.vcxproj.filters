@@ -15,6 +15,9 @@
     <ClCompile Include="NeuralNetwork.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="CudaNeuralNetwork.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernel.h">
@@ -33,6 +36,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="export.hpp">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="CudaNeuralNetwork.hpp">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

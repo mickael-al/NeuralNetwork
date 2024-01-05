@@ -1,146 +1,5 @@
 ﻿
 #include "kernel.h"
-#include "device_launch_parameters.h"
-#include "cuda_runtime.h"
-#include <curand_kernel.h>
-#include "CNNHelper.hpp"
-#include <stdio.h>
-#include "NeuralNetwork.hpp"
-
-__global__ void InitNeuralNetwork(const NeuralSwapData * nld, float* weight_buffer)
-{
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i >= nld->size)
-    {
-        return;
-    }
-    curandState state;
-    curand_init(nld->seed, i, 0, &state);
-    weight_buffer[i] = curand_uniform(&state) * 2.0f - 1.0f;
-}
-
-NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
-{
-    NeuralSwapData nld{};
-
-    if (nnd.nb_input_layer <= 0 || nnd.nb_col_hiden_layer <= 0 || nnd.nb_hiden_layer <= 0 || nnd.nb_output_layer <= 0)
-    {
-        fprintf(stderr, "createNeuralNetwork failed! invalid input NeuralNetworkData\n");
-        return nullptr;
-    }
-
-    nnd.activationSize = nnd.nb_input_layer + nnd.nb_col_hiden_layer * nnd.nb_hiden_layer + nnd.nb_output_layer;
-    nnd.weightSize = nnd.nb_input_layer * nnd.nb_hiden_layer;
-    for (int i = 0; i < nnd.nb_col_hiden_layer - 1; i++)
-    {
-        nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_hiden_layer;
-    }
-    nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_output_layer;
-    int layerStep = 2 + nnd.nb_col_hiden_layer;
-    nld.size = nnd.weightSize;
-    float * weight_buffer = 0;
-    float * activation_Buffer = 0;
-    float * result_Buffer = 0;
-    NeuralNetworkData* nnd_Buffer = 0;
-    NeuralSwapData* nld_Buffer = 0;
-    cudaError_t cudaStatus;
-
-    cudaStatus = cudaSetDevice(0);
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
-        goto Error;
-    }
-
-    cudaDeviceProp deviceProp;
-    cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
-
-    cudaStatus = cudaMalloc((void**)&weight_buffer, nnd.weightSize * sizeof(float));
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMalloc((void**)&activation_Buffer, nnd.activationSize * sizeof(float));
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMalloc((void**)&result_Buffer, nnd.nb_output_layer * sizeof(float));
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMalloc((void**)&nnd_Buffer, sizeof(NeuralNetworkData));
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMalloc((void**)&nld_Buffer, sizeof(NeuralSwapData));
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMemcpy(nnd_Buffer, &nnd, sizeof(NeuralNetworkData), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
-
-    cudaStatus = cudaMemcpy(nld_Buffer, &nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
-    dim3 dimGrid;
-    dim3 dimBlock;
-    
-    CNNHelper::KernelDispath(nld.size, &deviceProp, &dimGrid, &dimBlock);
-    InitNeuralNetwork<<<dimGrid, dimBlock>>>(nld_Buffer, weight_buffer);
-
-    cudaStatus = cudaGetLastError();
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "InitNeuralNetwork launch failed: %s\n", cudaGetErrorString(cudaStatus));
-        goto Error;
-    }
-
-    cudaStatus = cudaDeviceSynchronize();
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
-        goto Error;
-    }
-
-    std::cout << nnd.weightSize << " " << nnd.activationSize << std::endl;
-
-    return new NeuralNetwork(weight_buffer, activation_Buffer, result_Buffer, nnd_Buffer, nld_Buffer);
-
-Error:
-    cudaFree(weight_buffer);
-    cudaFree(activation_Buffer);
-    cudaFree(result_Buffer);
-    cudaFree(nnd_Buffer);
-    cudaFree(nld_Buffer);
-
-    return nullptr;
-}
-
-void releaseNeuralNetwork(NeuralNetwork* network)
-{
-    delete network;
-}
 
 __global__ void addKernel(int* c, const int* a, const int* b,const int * size)
 {
@@ -152,110 +11,171 @@ __global__ void addKernel(int* c, const int* a, const int* b,const int * size)
     c[i] = a[i] + b[i];
 }
 
-int addWithCuda(int *c, const int *a, const int *b, unsigned int size)
+
+__device__ float Tanh(float x)
 {
-    int *dev_a = 0;
-    int *dev_b = 0;
-    int *dev_c = 0;
-    int* thread_size = 0;
-    cudaError_t cudaStatus;
+	if (x > 20.0)
+	{
+		return 1.0;
+	}
+	else if (x < -20.0)
+	{
+		return -1.0;
+	}
+	else
+	{
+		float exp2x = exp(2 * x);
+		return (exp2x - 1) / (exp2x + 1);
+	}
+}
 
-    cudaStatus = cudaSetDevice(0);
-    if (cudaStatus != cudaSuccess) 
-    {
-        fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
-        goto Error;
-    }
+__device__ float TanhDerive(float x)
+{
 
-    cudaDeviceProp deviceProp;
-    cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
+	float tan = Tanh(x);
+	return 1.0 - tan * tan;
+}
 
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaGetDeviceProperties failed!  Do you have a CUDA-capable GPU installed?");
-        goto Error;
-    }
-  
-    cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) 
-    {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+__global__ void initNeuralNetwork(const NeuralSwapData* nld, float* weight_buffer)
+{
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
+	if (i >= nld->size)
+	{
+		return;
+	}
+	curandState state;
+	curand_init(nld->seed, i, 0, &state);
+	weight_buffer[i] = curand_uniform(&state) * 2.0f - 1.0f;
+}
 
-    cudaStatus = cudaMalloc((void**)&dev_a, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) 
-    {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
 
-    cudaStatus = cudaMalloc((void**)&dev_b, size * sizeof(int));
-    if (cudaStatus != cudaSuccess) 
-    {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+__global__ void propagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, const float* weight_buffer, float* activation_Buffer)
+{
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index >= nld->size)
+	{
+		return;
+	}
+	if (index >= nnd_Buffer->nb_input_layer && index < nnd_Buffer->nb_input_layer + nnd_Buffer->nb_hiden_layer && nld->layerId == 1)//layerId = 1
+	{
+		float sum = 0.0f;
+		for (int i = 0; i < nnd_Buffer->nb_input_layer; i++)
+		{
+			sum += activation_Buffer[i] * weight_buffer[((index - nnd_Buffer->nb_input_layer) * nnd_Buffer->nb_input_layer) + i];
+		}
+		activation_Buffer[index] = Tanh(sum);
+	}
+	else if (index >= (nnd_Buffer->activationSize - nnd_Buffer->nb_output_layer) && nld->layerId == (2 + nnd_Buffer->nb_col_hiden_layer) - 1)
+	{
+		int offsetbaseNN = nnd_Buffer->nb_input_layer + (nld->layerId - 2) * nnd_Buffer->nb_hiden_layer;
+		int offsetWeight = nnd_Buffer->nb_input_layer * nnd_Buffer->nb_hiden_layer + (nld->layerId - 2) * nnd_Buffer->nb_hiden_layer * nnd_Buffer->nb_hiden_layer;
+		int minOffsetWeight = index - (nnd_Buffer->activationSize - nnd_Buffer->nb_output_layer);
+		float sum = 0.0f;
+		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
+		{
+			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[offsetWeight + minOffsetWeight * nnd_Buffer->nb_hiden_layer + i];
+		}
+		activation_Buffer[index] = Tanh(sum);
+	}
+	else if (nld->layerId > 1 && nld->layerId < (2 + nnd_Buffer->nb_col_hiden_layer) - 1
+		&& index >= nnd_Buffer->nb_input_layer + nnd_Buffer->nb_hiden_layer
+		&& index < nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer)
+	{
+		int offsetbaseNN = (index - (index - nnd_Buffer->nb_input_layer) % nnd_Buffer->nb_hiden_layer) - nnd_Buffer->nb_hiden_layer;
+		int offsetWeight = nnd_Buffer->nb_input_layer * nnd_Buffer->nb_hiden_layer + (index - nnd_Buffer->nb_hiden_layer - nnd_Buffer->nb_input_layer) * nnd_Buffer->nb_hiden_layer;
+		float sum = 0.0f;
+		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
+		{
+			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[i + offsetWeight];
+		}
+		activation_Buffer[index] = Tanh(sum);
+	}
+}
 
-    cudaStatus = cudaMalloc((void**)&thread_size, sizeof(int));
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaMalloc failed!");
-        goto Error;
-    }
+__global__ void backPropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, float* weight_buffer, float* activation_Buffer, float* delta_Buffer, float* result_Buffer)
+{
+	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	if (index >= nld->size)
+	{
+		return;
+	}
 
-    cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) 
-    {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
+	if (index >= (nnd_Buffer->activationSize - nnd_Buffer->nb_output_layer) && nld->layerId == (2 + nnd_Buffer->nb_col_hiden_layer) - 1)
+	{
+		int offsetbaseNN = nnd_Buffer->nb_input_layer + (nld->layerId - 1) * nnd_Buffer->nb_hiden_layer;
+		delta_Buffer[index] = (1 - (activation_Buffer[index] * activation_Buffer[index])) * (activation_Buffer[index] - result_Buffer[index - offsetbaseNN]);
+	}
+	else if (nld->layerId == nnd_Buffer->nb_col_hiden_layer &&
+		index >= nnd_Buffer->nb_input_layer + (nld->layerId - 1) * nnd_Buffer->nb_hiden_layer &&
+		index < nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer)
+	{
+		int offsetDelta = nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer;
+		int offsetWeight = nnd_Buffer->nb_input_layer * nnd_Buffer->nb_hiden_layer + (nld->layerId - 1) * nnd_Buffer->nb_hiden_layer * nnd_Buffer->nb_hiden_layer;
+		int minOffsetWeight = (index - ((nnd_Buffer->activationSize - nnd_Buffer->nb_hiden_layer) - nnd_Buffer->nb_output_layer)) * nnd_Buffer->nb_output_layer;
+		float sum = 0.0f;
+		for (int i = 0; i < nnd_Buffer->nb_output_layer; i++)
+		{
+			sum += delta_Buffer[offsetDelta + index] * weight_buffer[offsetWeight + minOffsetWeight + i];
+		}
+		delta_Buffer[index] = (1 - (activation_Buffer[index] * activation_Buffer[index])) * sum;
+		for (int i = 0; i < nnd_Buffer->nb_output_layer; i++)
+		{
+			weight_buffer[offsetWeight + minOffsetWeight + i] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];
+		}
+	}
+	else if (nld->layerId > 1 && nld->layerId < nnd_Buffer->nb_col_hiden_layer
+		&& index >= nnd_Buffer->nb_input_layer
+		&& index < nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer)
+	{
+		int nblayer = 1 + nnd_Buffer->nb_col_hiden_layer;
+		int offsetDelta = nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer;
+		int offsetWeight = nnd_Buffer->nb_input_layer * nnd_Buffer->nb_hiden_layer + (nld->layerId - 1) * nnd_Buffer->nb_hiden_layer * nnd_Buffer->nb_hiden_layer;
+		int minOffsetWeight = (index - ((nnd_Buffer->activationSize - (nblayer - nld->layerId) * nnd_Buffer->nb_hiden_layer) - nnd_Buffer->nb_output_layer)) * nnd_Buffer->nb_hiden_layer;
+		float sum = 0.0f;
+		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
+		{
+			sum += delta_Buffer[offsetDelta + index] * weight_buffer[offsetWeight + minOffsetWeight + i];
+		}
+		delta_Buffer[index] = (1 - (activation_Buffer[index] * activation_Buffer[index])) * sum;
+		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
+		{
+			weight_buffer[offsetWeight + minOffsetWeight + i] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];
+		}
+	}
+	else if (index < nnd_Buffer->nb_input_layer && nld->layerId == 0)
+	{
+		int nblayer = 1 + nnd_Buffer->nb_col_hiden_layer;
+		int offsetDelta = nnd_Buffer->nb_input_layer;
+		int offsetWeight = index * nnd_Buffer->nb_hiden_layer;
+		float sum = 0.0f;
+		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
+		{
+			sum += delta_Buffer[offsetDelta + index] * weight_buffer[offsetWeight + i];
+		}
+		delta_Buffer[index] = (1 - (activation_Buffer[index] * activation_Buffer[index])) * sum;
+		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
+		{
+			weight_buffer[offsetWeight + i] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];
+		}
+	}
+}
 
-    cudaStatus = cudaMemcpy(dev_b, b, size * sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess) 
-    {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
+void AddKernel(dim3 dimGrid, dim3 dimBlock, int* c, const int* a, const int* b, const int* size)
+{
+    addKernel<<<dimGrid, dimBlock>>>(c, a, b, size);
+}
 
-    cudaStatus = cudaMemcpy(thread_size, &size, sizeof(int), cudaMemcpyHostToDevice);
-    if (cudaStatus != cudaSuccess)
-    {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
+void InitNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralSwapData* nld, float* weight_buffer)
+{
+	initNeuralNetwork<<<dimGrid, dimBlock>>>(nld, weight_buffer);
+}
 
-    dim3 dimGrid;
-    dim3 dimBlock;
+void PropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, const float* weight_buffer, float* activation_Buffer)
+{
+	propagateNeuralNetwork<<<dimGrid, dimBlock>>>(nnd_Buffer, nld, weight_buffer, activation_Buffer);
+}
 
-    CNNHelper::KernelDispath(size, &deviceProp, &dimGrid, &dimBlock);
-    addKernel <<<dimGrid, dimBlock >>> (dev_c, dev_a, dev_b, thread_size);
-
-    cudaStatus = cudaGetLastError();
-    if (cudaStatus != cudaSuccess) 
-    {
-        fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
-        goto Error;
-    }
-
-    cudaStatus = cudaDeviceSynchronize();
-    if (cudaStatus != cudaSuccess) 
-    {
-        fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
-        goto Error;
-    }
-
-    cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
-    if (cudaStatus != cudaSuccess) 
-    {
-        fprintf(stderr, "cudaMemcpy failed!");
-        goto Error;
-    }
-
-Error:
-    cudaFree(dev_c);
-    cudaFree(dev_a);
-    cudaFree(dev_b);
-    
-    return cudaStatus;
+void BackPropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, float* weight_buffer, float* activation_Buffer, float* delta_Buffer, float* result_Buffer)
+{
+	backPropagateNeuralNetwork<<<dimGrid, dimBlock>>>(nnd_Buffer, nld, weight_buffer, activation_Buffer, delta_Buffer, result_Buffer);
 }
