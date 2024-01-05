@@ -21,49 +21,44 @@ __device__ float Tanh(float x)
 	}
 }
 
-__global__ void PropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld,const float* weight_buffer, float* activation_Buffer)
+__global__ void PropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, const float* weight_buffer, float* activation_Buffer)
 {
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index >= nld->size)
 	{
 		return;
 	}
-	int offset = index % nnd_Buffer->activationSize;
-	if (offset >= nnd_Buffer->nb_input_layer && offset < nnd_Buffer->nb_input_layer + nnd_Buffer->nb_hiden_layer && nld->layerId == 1)//layerId = 1
+	if (index >= nnd_Buffer->nb_input_layer && index < nnd_Buffer->nb_input_layer + nnd_Buffer->nb_hiden_layer && nld->layerId == 1)//layerId = 1
 	{
-		int offsetbaseNN = index - offset;
-		int oinuputNN = (offsetbaseNN + nnd_Buffer->nb_input_layer);
-		int weightOffset = (int(offsetbaseNN / nnd_Buffer->activationSize)) * nnd_Buffer->weightSize;
 		float sum = 0.0f;
 		for (int i = 0; i < nnd_Buffer->nb_input_layer; i++)
 		{
-			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[weightOffset + ((index - oinuputNN) * nnd_Buffer->nb_input_layer) + i];
+			sum += activation_Buffer[i] * weight_buffer[((index - nnd_Buffer->nb_input_layer) * nnd_Buffer->nb_input_layer) + i];
 		}
 		activation_Buffer[index] = Tanh(sum);
 	}
-	else if (offset >= (nnd_Buffer->activationSize - nnd_Buffer->nb_output_layer) && nld->layerId == (2 + nnd_Buffer->nb_col_hiden_layer) - 1)
+	else if (index >= (nnd_Buffer->activationSize - nnd_Buffer->nb_output_layer) && nld->layerId == (2 + nnd_Buffer->nb_col_hiden_layer) - 1)
 	{
-		int offsetbaseNN = (index - offset) + nnd_Buffer->nb_input_layer + (nld->layerId - 2) * nnd_Buffer->nb_hiden_layer;
-		int oinuputNN = offsetbaseNN + nnd_Buffer->nb_hiden_layer;
-		int weightOffset = ((int((index - offset) / nnd_Buffer->activationSize)) * nnd_Buffer->weightSize) + nnd_Buffer->nb_input_layer * nnd_Buffer->nb_hiden_layer + ((nld->layerId - 2) * nnd_Buffer->nb_hiden_layer * nnd_Buffer->nb_hiden_layer);
+		int offsetbaseNN = nnd_Buffer->nb_input_layer + (nld->layerId - 2) * nnd_Buffer->nb_hiden_layer;
+		int offsetWeight = nnd_Buffer->nb_input_layer * nnd_Buffer->nb_hiden_layer + (nld->layerId - 2) * nnd_Buffer->nb_hiden_layer * nnd_Buffer->nb_hiden_layer;
+		int minOffsetWeight = index - (nnd_Buffer->activationSize - nnd_Buffer->nb_output_layer);
 		float sum = 0.0f;
 		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
 		{
-			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[weightOffset + ((index - oinuputNN) * nnd_Buffer->nb_hiden_layer) + i];
+			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[offsetWeight + minOffsetWeight* nnd_Buffer->nb_hiden_layer + i];
 		}
 		activation_Buffer[index] = Tanh(sum);
 	}
 	else if (nld->layerId > 1 && nld->layerId < (2 + nnd_Buffer->nb_col_hiden_layer) - 1
-		&& offset >= nnd_Buffer->nb_input_layer + (nld->layerId - 1) * nnd_Buffer->nb_hiden_layer
-		&& offset < nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer)
+		&& index >= nnd_Buffer->nb_input_layer + nnd_Buffer->nb_hiden_layer
+		&& index < nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer)
 	{
-		int offsetbaseNN = (index - offset) + nnd_Buffer->nb_input_layer + (nld->layerId - 2) * nnd_Buffer->nb_hiden_layer;
-		int oinuputNN = offsetbaseNN + nnd_Buffer->nb_hiden_layer;
-		int weightOffset = ((int((index - offset) / nnd_Buffer->activationSize)) * nnd_Buffer->weightSize) + nnd_Buffer->nb_input_layer * nnd_Buffer->nb_hiden_layer + ((nld->layerId - 2) * nnd_Buffer->nb_hiden_layer * nnd_Buffer->nb_hiden_layer);
+		int offsetbaseNN = (index - (index - nnd_Buffer->nb_input_layer) % nnd_Buffer->nb_hiden_layer)- nnd_Buffer->nb_hiden_layer;
+		int offsetWeight = nnd_Buffer->nb_input_layer * nnd_Buffer->nb_hiden_layer + (index - nnd_Buffer->nb_hiden_layer - nnd_Buffer->nb_input_layer) * nnd_Buffer->nb_hiden_layer;
 		float sum = 0.0f;
 		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
 		{
-			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[weightOffset + ((index - oinuputNN) * nnd_Buffer->nb_hiden_layer) + i];
+			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[i+ offsetWeight];
 		}
 		activation_Buffer[index] = Tanh(sum);
 	}
@@ -116,7 +111,7 @@ void NeuralNetwork::propagate()
 
 
 	int layerStep = 2 + m_nnd_Buffer->nb_col_hiden_layer;
-	m_nld_Buffer->size = m_nnd_Buffer->weightSize;
+	m_nld_Buffer->size = m_nnd_Buffer->activationSize;
 	dim3 dimGrid;
 	dim3 dimBlock;
 
@@ -124,7 +119,7 @@ void NeuralNetwork::propagate()
 	for (int i = 0; i < layerStep - 1; i++)
 	{
 		m_nld_Buffer->layerId = i + 1;
-		PropagateNeuralNetwork <<<dimGrid, dimBlock >>> (m_nnd_Buffer, m_nld_Buffer, m_weight_buffer, m_activation_Buffer);
+		//PropagateNeuralNetwork<<<dimGrid, dimBlock>>>(m_nnd_Buffer, m_nld_Buffer, m_weight_buffer, m_activation_Buffer);
 	}
 }
 

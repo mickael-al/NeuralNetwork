@@ -26,8 +26,8 @@ int main()
     {
         std::cout << c[i] << " ";
     }
-    std::cout << std::endl;
-    */
+    std::cout << std::endl;*/
+    
     CreateNeuralNetwork createNeuralNetwork = (CreateNeuralNetwork)GetProcAddress(hDll, "createNeuralNetwork");
     ReleaseNeuralNetwork releaseNeuralNetwork = (ReleaseNeuralNetwork)GetProcAddress(hDll, "releaseNeuralNetwork");
     if (createNeuralNetwork == NULL)
@@ -44,7 +44,7 @@ int main()
     nnd.nb_input_layer = 2;
     nnd.nb_col_hiden_layer = 4;
     nnd.nb_hiden_layer = 4;
-    nnd.nb_output_layer = 1;
+    nnd.nb_output_layer = 2;
     NeuralNetwork * nn = createNeuralNetwork(nnd);    
     const std::string modelPath = "test";
     releaseNeuralNetwork(nn);

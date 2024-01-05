@@ -38,7 +38,7 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
     nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_output_layer;
     int layerStep = 2 + nnd.nb_col_hiden_layer;
     nld.size = nnd.weightSize;
-    float* weight_buffer = 0;
+    float * weight_buffer = 0;
     float * activation_Buffer = 0;
     NeuralNetworkData* nnd_Buffer = 0;
     NeuralSwapData* nld_Buffer = 0;
@@ -114,6 +114,8 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
         fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
         goto Error;
     }
+
+    std::cout << nnd.weightSize << " " << nnd.activationSize << std::endl;
 
     return new NeuralNetwork(weight_buffer, activation_Buffer, nnd_Buffer, nld_Buffer);
 
