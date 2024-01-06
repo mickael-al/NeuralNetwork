@@ -16,6 +16,7 @@ NeuralNetwork::NeuralNetwork(NeuralNetworkData nnd)
 	nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_output_layer;
 	int layerStep = 2 + nnd.nb_col_hiden_layer;
 	m_nld.size = nnd.weightSize;
+	m_nld.seed = 1;
 	NeuralNetworkData* nnd_Buffer = 0;
 	NeuralSwapData* nld_Buffer = 0;
 	cudaError_t cudaStatus;
@@ -147,7 +148,7 @@ void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
 	float* result_compare = new float[1];
 	float* re = new float[m_nnd.activationSize];
 	float errormoy = 0.0f;
-	for (int j = 0; j < 1000; j++)
+	for (int j = 0; j < 1001; j++)
 	{
 		errormoy = 0.0f;
 		for (int i = 0; i < 4; i++)
@@ -155,20 +156,11 @@ void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
 			cudaMemcpy(m_activation_Buffer, xor_data[i].data(), sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
 			propagate();
 			backPropagate(xor_result_data[i]);
-			/*cudaMemcpy(result_compare, m_activation_Buffer + (m_nnd.activationSize - m_nnd.nb_output_layer), sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyDeviceToHost);
-			errormoy += xor_result_data[i][0] - result_compare[0];*/
-			if (j > 950)
-			{
-				cudaMemcpy(re, m_activation_Buffer, sizeof(float) * m_nnd.activationSize, cudaMemcpyDeviceToHost);
-				for (int k = 0; k < m_nnd.activationSize; k++)
-				{
-					std::cout << re[k] << " ,";
-				}
-				std::cout << std::endl;
-			}
+			cudaMemcpy(result_compare, m_activation_Buffer+(m_nnd.activationSize- m_nnd.nb_output_layer), sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
+			errormoy += abs(xor_result_data[i][0] - result_compare[0]);					
 		}
-		//errormoy = errormoy / 4.0f;
-		//std::cout << errormoy << std::endl;
+		errormoy = errormoy / 4.0f;
+		std::cout << errormoy << std::endl;
 	}
 }
 
@@ -229,6 +221,7 @@ void NeuralNetwork::backPropagate(std::vector<float> prediction_Data)
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
 
 	cudaStatus = cudaMemcpy(m_result_Buffer, prediction_Data.data(), sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyHostToDevice);
+	
 	if (cudaStatus != cudaSuccess)
 	{
 		fprintf(stderr, "cudaMemcpy failed!");

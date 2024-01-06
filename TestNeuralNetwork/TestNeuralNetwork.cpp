@@ -46,7 +46,7 @@ int main()
     nnd.nb_col_hiden_layer = 4;
     nnd.nb_hiden_layer = 4;
     nnd.nb_output_layer = 1;
-    nnd.mutation_multiplayer = 0.1f;
+    nnd.mutation_multiplayer = 0.05f;
     NeuralNetwork * nn = createNeuralNetwork(nnd);        
     const std::string modelPath = "test";
     trainingNeuralNetwork(nn, modelPath);
