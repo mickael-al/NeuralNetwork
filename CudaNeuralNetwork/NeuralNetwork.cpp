@@ -16,7 +16,7 @@ NeuralNetwork::NeuralNetwork(NeuralNetworkData nnd)
 	nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_output_layer;
 	int layerStep = 2 + nnd.nb_col_hiden_layer;
 	m_nld.size = nnd.weightSize;
-	m_nld.seed = 1;
+	m_nld.seed = 4;
 	NeuralNetworkData* nnd_Buffer = 0;
 	NeuralSwapData* nld_Buffer = 0;
 	cudaError_t cudaStatus;
@@ -159,7 +159,7 @@ void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
 			cudaMemcpy(result_compare, m_activation_Buffer+(m_nnd.activationSize- m_nnd.nb_output_layer), sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
 			errormoy += abs(xor_result_data[i][0] - result_compare[0]);					
 		}
-		errormoy = errormoy / 4.0f;
+		//errormoy = errormoy / 4.0f;
 		std::cout << errormoy << std::endl;
 	}
 }
