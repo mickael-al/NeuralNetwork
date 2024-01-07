@@ -156,11 +156,24 @@ void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
 			cudaMemcpy(m_activation_Buffer, xor_data[i].data(), sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
 			propagate();
 			backPropagate(xor_result_data[i]);
-			cudaMemcpy(result_compare, m_activation_Buffer+(m_nnd.activationSize- m_nnd.nb_output_layer), sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
-			errormoy += abs(xor_result_data[i][0] - result_compare[0]);					
+			//cudaMemcpy(result_compare, m_activation_Buffer+(m_nnd.activationSize- m_nnd.nb_output_layer), sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
+			//errormoy += abs(xor_result_data[i][0] - result_compare[0]);		
+			cudaMemcpy(re, m_activation_Buffer, sizeof(float) * m_nnd.activationSize, cudaMemcpyDeviceToHost);
+			if (j % 100 == 0)
+			{
+				for (int i = 0; i < m_nnd.activationSize; i++)
+				{
+					std::cout << re[i] << " ,";
+				}
+				std::cout << std::endl;
+			}
+		}
+		if (j % 100 == 0)
+		{
+			std::cout << std::endl;
 		}
 		//errormoy = errormoy / 4.0f;
-		std::cout << errormoy << std::endl;
+		//std::cout << errormoy << std::endl;
 	}
 }
 

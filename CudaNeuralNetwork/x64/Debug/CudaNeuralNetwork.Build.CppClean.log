@@ -1,7 +1,9 @@
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\vc143.pdb
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\vc143.idb
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\neuralnetwork.obj
+d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\imagedata.obj
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\cudaneuralnetwork.obj
+d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\color.obj
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\cnnhelper.obj
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\kernel.cu.obj
 d:\projet\cpp\cudaneuralnetwork\x64\debug\cudaneuralnetwork.lib
@@ -10,6 +12,7 @@ d:\projet\cpp\cudaneuralnetwork\x64\debug\cudaneuralnetwork.dll
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\cudaneuralnetwork.ilk
 d:\projet\cpp\cudaneuralnetwork\x64\debug\cudaneuralnetwork.pdb
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\kernel.cu.cache
+d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\datasetcreator.obj
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\cudaneur.64edac79.tlog\cl.command.1.tlog
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\cudaneur.64edac79.tlog\cl.items.tlog
 d:\projet\cpp\cudaneuralnetwork\cudaneuralnetwork\x64\debug\cudaneur.64edac79.tlog\cl.read.1.tlog

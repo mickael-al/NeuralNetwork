@@ -31,6 +31,7 @@ int main()
     CreateNeuralNetwork createNeuralNetwork = (CreateNeuralNetwork)GetProcAddress(hDll, "createNeuralNetwork");
     ReleaseNeuralNetwork releaseNeuralNetwork = (ReleaseNeuralNetwork)GetProcAddress(hDll, "releaseNeuralNetwork");
     TrainingNeuralNetwork trainingNeuralNetwork = (TrainingNeuralNetwork)GetProcAddress(hDll, "trainingNeuralNetwork");
+    GenerateDataSet generateDataSet = (GenerateDataSet)GetProcAddress(hDll, "generateDataSet");
     if (createNeuralNetwork == NULL)
     {
         std::cerr << "createNeuralNetwork not found" << std::endl;
@@ -49,6 +50,7 @@ int main()
     nnd.mutation_multiplayer = 0.05f;
     NeuralNetwork * nn = createNeuralNetwork(nnd);        
     const std::string modelPath = "test";
+    //generateDataSet("D:/Projet/Cpp/CudaNeuralNetwork/DataSet", "D:/Projet/Cpp/CudaNeuralNetwork/DataSet/data.dataset");
     trainingNeuralNetwork(nn, modelPath);
     releaseNeuralNetwork(nn);
     return 0;
