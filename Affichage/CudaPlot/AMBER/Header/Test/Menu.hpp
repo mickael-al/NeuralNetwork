@@ -3,6 +3,7 @@
 
 #include "Scene.hpp"
 #include "GameEngine.hpp"
+#include "implot.h"
 
 class Menu : public Scene, public ImguiBlock, public Behaviour
 {
