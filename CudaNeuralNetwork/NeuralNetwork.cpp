@@ -16,7 +16,7 @@ NeuralNetwork::NeuralNetwork(NeuralNetworkData nnd)
 	nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_output_layer;
 	int layerStep = 2 + nnd.nb_col_hiden_layer;
 	m_nld.size = nnd.weightSize;
-	m_nld.seed = 4;
+	m_nld.seed = 0;
 	NeuralNetworkData* nnd_Buffer = 0;
 	NeuralSwapData* nld_Buffer = 0;
 	cudaError_t cudaStatus;
@@ -136,26 +136,26 @@ void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
 	cudaDeviceProp deviceProp;
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
 	std::vector<std::vector<float>> xor_data;
-	xor_data.push_back({ -1,-1 });
-	xor_data.push_back({ -1,1 });
-	xor_data.push_back({ 1,-1 });
+	xor_data.push_back({ 1,0 });
 	xor_data.push_back({ 1,1 });
+	xor_data.push_back({ 0,1 });
+	//xor_data.push_back({ 1,1 });
 	std::vector<std::vector<float>> xor_result_data;
-	xor_result_data.push_back({ -1 });
 	xor_result_data.push_back({ 1 });
 	xor_result_data.push_back({ 1 });
 	xor_result_data.push_back({ -1 });
+	//xor_result_data.push_back({ 1 });
 	float* result_compare = new float[1];
 	float* re = new float[m_nnd.activationSize];
 	float errormoy = 0.0f;
-	for (int j = 0; j < 1001; j++)
+	for (int j = 0; j < 100001; j++)
 	{
 		errormoy = 0.0f;
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			cudaMemcpy(m_activation_Buffer, xor_data[i].data(), sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
 			propagate();
-			backPropagate(xor_result_data[i]);
+			//backPropagate(xor_result_data[i]);
 			//cudaMemcpy(result_compare, m_activation_Buffer+(m_nnd.activationSize- m_nnd.nb_output_layer), sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
 			//errormoy += abs(xor_result_data[i][0] - result_compare[0]);		
 			cudaMemcpy(re, m_activation_Buffer, sizeof(float) * m_nnd.activationSize, cudaMemcpyDeviceToHost);
@@ -250,7 +250,9 @@ void NeuralNetwork::backPropagate(std::vector<float> prediction_Data)
 	for (int i = layerStep - 2; i >= -1; i--)
 	{
 		m_nld.layerId = i + 1;
+		//std::cout << m_nld.layerId << " ,";
 		cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
 		BackPropagateNeuralNetwork(dimGrid, dimBlock,m_nnd_Buffer, m_nld_Buffer, m_weight_buffer, m_activation_Buffer, m_delta_Buffer, m_result_Buffer);
 	}
+	//std::cout << std::endl;
 }
