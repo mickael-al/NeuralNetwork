@@ -8,8 +8,8 @@
 #include "NeuralSwapData.hpp"
 
 void AddKernel(dim3 dimGrid, dim3 dimBlock,int* c, const int* a, const int* b, const int* size);
-void InitNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralSwapData* nld, float* weight_buffer);
-void PropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, float* weight_buffer, float* activation_Buffer);
-void BackPropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, float* weight_buffer, float* activation_Buffer, float* delta_Buffer, float* result_Buffer);
+void PropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralSwapData* nld, const NeuralNetworkDataCompact* nndc, const int* self_d, float*** self_w, float** self_x);
+void BackPropagateNeuralNetworkCompact(dim3 dimGrid, dim3 dimBlock, const NeuralSwapData* nld, const int* self_d, float*** self_w, float** self_x, float** self_delta);
+void BackPropagateNeuralNetworkCompactEnd(dim3 dimGrid, dim3 dimBlock, const NeuralSwapData* nld, const NeuralNetworkDataCompact* nndc, const int* self_d, float*** self_w, float** self_x, float** self_delta);
 
 #endif // KERNEL_H

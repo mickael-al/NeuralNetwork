@@ -9,7 +9,15 @@ struct NeuralNetworkData
 	int nb_col_hiden_layer;
 	int activationSize;
 	int weightSize;
-	float mutation_multiplayer;
+	bool is_classification;
+	float alpha;
+};
+
+struct NeuralNetworkDataCompact
+{
+	int self_l;
+	bool is_classification;
+	float alpha;
 };
 
 #endif //!__NEURAL_NETWORK_DATA__

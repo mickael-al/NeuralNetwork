@@ -3,7 +3,7 @@
 
 struct NeuralSwapData
 {
-	int layerId;
+	int l;
 	int size;
 	int seed;
 };

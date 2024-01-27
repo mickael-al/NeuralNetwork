@@ -47,7 +47,7 @@ int main()
     nnd.nb_col_hiden_layer = 4;
     nnd.nb_hiden_layer = 4;
     nnd.nb_output_layer = 1;
-    nnd.mutation_multiplayer = 0.01f;
+    nnd.alpha = 0.01f;
     NeuralNetwork * nn = createNeuralNetwork(nnd);        
     const std::string modelPath = "test";
     //generateDataSet("C:/Users/micka/Documents/Projet/Cpp/NeuralNetwork/DataSet", "C:/Users/micka/Documents/Projet/Cpp/NeuralNetwork/DataSet/data.dataset");

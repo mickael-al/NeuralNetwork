@@ -18,14 +18,22 @@ public:
 	void propagate();
 	void backPropagate(std::vector<float> prediction_Data);
 private:
-	float* m_weight_buffer;
-	float* m_activation_Buffer;
-	float* m_result_Buffer;
-	float* m_delta_Buffer;
-	NeuralNetworkData* m_nnd_Buffer;
+	//gpu
+	float *** m_self_w;
+	float ** m_self_x;
+	float ** m_self_delta;
+	int* m_self_d;
 	NeuralSwapData* m_nld_Buffer;
+	NeuralNetworkDataCompact* m_nndc_Buffer;
+	//gpu
+
 	NeuralNetworkData m_nnd;
 	NeuralSwapData m_nld;
+	NeuralNetworkDataCompact m_nndc;
+	int* m_array_size_d;
+	float* m_outDelta;
+	float* m_activation;
+
 };
 
 #endif //!__NEURAL_NETWORK__

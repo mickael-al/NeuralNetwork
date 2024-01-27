@@ -4,21 +4,32 @@
 #include <curand_kernel.h>
 #include "CNNHelper.hpp"
 #include "kernel.h"
+#include <cstdlib>
+#include <ctime>
 
 NeuralNetwork::NeuralNetwork(NeuralNetworkData nnd)
 {
-	nnd.activationSize = nnd.nb_input_layer + nnd.nb_col_hiden_layer * nnd.nb_hiden_layer + nnd.nb_output_layer;
-	nnd.weightSize = nnd.nb_input_layer * nnd.nb_hiden_layer;
+	nnd.activationSize = (nnd.nb_input_layer+1) + (nnd.nb_col_hiden_layer) * (nnd.nb_hiden_layer+1) + (nnd.nb_output_layer+1);
+	nnd.weightSize = (nnd.nb_input_layer+1) * (nnd.nb_hiden_layer+1);
 	for (int i = 0; i < nnd.nb_col_hiden_layer - 1; i++)
 	{
-		nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_hiden_layer;
+		nnd.weightSize += (nnd.nb_hiden_layer + 1) * (nnd.nb_hiden_layer + 1);
 	}
-	nnd.weightSize += nnd.nb_hiden_layer * nnd.nb_output_layer;
+	nnd.weightSize += (nnd.nb_hiden_layer + 1) * (nnd.nb_output_layer + 1);
 	int layerStep = 2 + nnd.nb_col_hiden_layer;
 	m_nld.size = nnd.weightSize;
 	m_nld.seed = 0;
-	NeuralNetworkData* nnd_Buffer = 0;
-	NeuralSwapData* nld_Buffer = 0;
+	m_array_size_d = new int[nnd.nb_col_hiden_layer + 2];
+	m_array_size_d[0] = nnd.nb_input_layer;
+	for (int i = 0; i < nnd.nb_col_hiden_layer; i++)
+	{
+		m_array_size_d[i+1] = nnd.nb_hiden_layer;
+	}
+	m_array_size_d[nnd.nb_col_hiden_layer + 1] = nnd.nb_output_layer;
+	m_nndc.self_l = nnd.nb_col_hiden_layer + 1;
+	m_nndc.is_classification = nnd.is_classification;
+	std::srand(static_cast<unsigned int>(std::time(0)));	
+
 	cudaError_t cudaStatus;
 
 	cudaStatus = cudaSetDevice(0);
@@ -31,66 +42,56 @@ NeuralNetwork::NeuralNetwork(NeuralNetworkData nnd)
 	cudaDeviceProp deviceProp;
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
 
-	cudaStatus = cudaMalloc((void**)&m_weight_buffer, nnd.weightSize * sizeof(float));
-	if (cudaStatus != cudaSuccess)
-	{
-		fprintf(stderr, "cudaMalloc failed!");
-		return;
+	cudaMallocManaged((void****)&m_self_w, (nnd.nb_col_hiden_layer + 2) * sizeof(float**));
+	for (int l = 1; l < nnd.nb_col_hiden_layer + 2; l++)
+	{		
+		cudaMallocManaged((void***)&m_self_w[l], (m_array_size_d[l - 1] + 1) * sizeof(float*));
+		for (int i = 0; i < (m_array_size_d[l - 1] + 1); i++)
+		{
+			cudaMallocManaged((void**)&m_self_w[l][i], (m_array_size_d[l] + 1) * sizeof(float));
+			for (int j = 0; j < (m_array_size_d[l] + 1); j++)
+			{
+				if (j == 0)
+				{
+					m_self_w[l][i][j] = 1.0f;
+				}
+				else
+				{
+					m_self_w[l][i][j] = ((static_cast<float>(rand()) / RAND_MAX) * 2.0f) - 1;
+				}
+			}
+		}
 	}
+	cudaDeviceSynchronize();
+	cudaMallocManaged((void***)&m_self_x, (nnd.nb_col_hiden_layer + 2) * sizeof(float*));
+	cudaMallocManaged((void***)&m_self_delta, (nnd.nb_col_hiden_layer + 2) * sizeof(float*));
 
-	cudaStatus = cudaMalloc((void**)&m_activation_Buffer, nnd.activationSize * sizeof(float));
-	if (cudaStatus != cudaSuccess)
+	for (int l = 0; l < nnd.nb_col_hiden_layer + 2; l++)
 	{
-		fprintf(stderr, "cudaMalloc failed!");
-		return;
+		cudaMallocManaged((void**)&m_self_x[l], (m_array_size_d[l] + 1) * sizeof(float));
+		cudaMallocManaged((void**)&m_self_delta[l], (m_array_size_d[l] + 1) * sizeof(float));
+		for (int j = 0; j < (m_array_size_d[l] + 1); j++)
+		{
+			m_self_delta[l][j] = 0.0f;
+			if (j == 0)
+			{
+				m_self_x[l][j] = 1.0f;
+			}
+			else
+			{
+				m_self_x[l][j] = 2.0f;
+			}
+		}
 	}
+	cudaDeviceSynchronize();
+	cudaMalloc((void**)&m_self_d, (nnd.nb_col_hiden_layer + 2) * sizeof(int));
+	cudaMemcpy(m_self_d, m_array_size_d, (nnd.nb_col_hiden_layer + 2) * sizeof(int), cudaMemcpyHostToDevice);
 
-	cudaStatus = cudaMalloc((void**)&m_result_Buffer, nnd.nb_output_layer * sizeof(float));
-	if (cudaStatus != cudaSuccess)
-	{
-		fprintf(stderr, "cudaMalloc failed!");
-		return;
-	}
+	cudaMalloc((void**)&m_nndc_Buffer, sizeof(NeuralNetworkDataCompact));
+	cudaMemcpy(m_nndc_Buffer, &m_nndc, sizeof(NeuralNetworkDataCompact), cudaMemcpyHostToDevice);
 
-	cudaStatus = cudaMalloc((void**)&m_delta_Buffer, nnd.activationSize * sizeof(float));
-	if (cudaStatus != cudaSuccess)
-	{
-		fprintf(stderr, "cudaMalloc failed!");
-		return;
-	}	
-
-	cudaStatus = cudaMalloc((void**)&nnd_Buffer, sizeof(NeuralNetworkData));
-	if (cudaStatus != cudaSuccess)
-	{
-		fprintf(stderr, "cudaMalloc failed!");
-		return;
-	}
-
-	cudaStatus = cudaMalloc((void**)&nld_Buffer, sizeof(NeuralSwapData));
-	if (cudaStatus != cudaSuccess)
-	{
-		fprintf(stderr, "cudaMalloc failed!");
-		return;
-	}
-
-	cudaStatus = cudaMemcpy(nnd_Buffer, &nnd, sizeof(NeuralNetworkData), cudaMemcpyHostToDevice);
-	if (cudaStatus != cudaSuccess)
-	{
-		fprintf(stderr, "cudaMemcpy failed!");
-		return;
-	}
-
-	cudaStatus = cudaMemcpy(nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
-	if (cudaStatus != cudaSuccess)
-	{
-		fprintf(stderr, "cudaMemcpy failed!");
-		return;
-	}
-	dim3 dimGrid;
-	dim3 dimBlock;
-
-	CNNHelper::KernelDispath(m_nld.size, &deviceProp, &dimGrid, &dimBlock);
-	InitNeuralNetwork(dimGrid, dimBlock,nld_Buffer, m_weight_buffer);
+	cudaMalloc((void**)&m_nld_Buffer, sizeof(NeuralSwapData));
+	cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
 
 	cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess)
@@ -106,21 +107,25 @@ NeuralNetwork::NeuralNetwork(NeuralNetworkData nnd)
 		return;
 	}
 
-	std::cout << nnd.weightSize << " " << nnd.activationSize << std::endl;
+	m_outDelta = new float[m_array_size_d[m_nndc.self_l] + 1];
+	m_activation = new float[m_array_size_d[m_nndc.self_l] + 1];
 
-	m_nnd_Buffer = nnd_Buffer;
-	m_nld_Buffer = nld_Buffer;
 	m_nnd = nnd;
 }
 
 NeuralNetwork::~NeuralNetwork()
 {
-	cudaFree(m_weight_buffer);
-	cudaFree(m_activation_Buffer);
-	cudaFree(m_result_Buffer);
-	cudaFree(m_nnd_Buffer);
+	delete m_outDelta;
+	delete m_activation;
+	delete m_array_size_d;
+	//cudaFree(m_weight_buffer);
+	//cudaFree(m_activation_Buffer);
+	//cudaFree(m_result_Buffer);
+	//cudaFree(m_nnd_Buffer);
 	cudaFree(m_nld_Buffer);
-	cudaFree(m_delta_Buffer);
+	cudaFree(m_nndc_Buffer);
+	//cudaFree(m_delta_Buffer);
+	std::cout << "Free all buffer !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
 }
 
 void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
@@ -136,41 +141,27 @@ void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
 	cudaDeviceProp deviceProp;
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
 	std::vector<std::vector<float>> xor_data;
+	xor_data.push_back({ 0,0 });
 	xor_data.push_back({ 1,0 });
-	xor_data.push_back({ 1,1 });
 	xor_data.push_back({ 0,1 });
-	//xor_data.push_back({ 1,1 });
+	xor_data.push_back({ 1,1 });
 	std::vector<std::vector<float>> xor_result_data;
+	xor_result_data.push_back({ -1 });
 	xor_result_data.push_back({ 1 });
 	xor_result_data.push_back({ 1 });
 	xor_result_data.push_back({ -1 });
-	//xor_result_data.push_back({ 1 });
 	float* result_compare = new float[1];
-	float* re = new float[m_nnd.activationSize];
 	float errormoy = 0.0f;
 	for (int j = 0; j < 100001; j++)
 	{
 		errormoy = 0.0f;
-		for (int i = 0; i < 3; i++)
-		{
-			cudaMemcpy(m_activation_Buffer, xor_data[i].data(), sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
+		for (int i = 0; i < 4; i++)
+		{			
+			cudaMemcpy(m_self_x[0]+1, xor_data[i].data(), sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
 			propagate();
 			//backPropagate(xor_result_data[i]);
-			//cudaMemcpy(result_compare, m_activation_Buffer+(m_nnd.activationSize- m_nnd.nb_output_layer), sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
-			//errormoy += abs(xor_result_data[i][0] - result_compare[0]);		
-			cudaMemcpy(re, m_activation_Buffer, sizeof(float) * m_nnd.activationSize, cudaMemcpyDeviceToHost);
-			if (j % 100 == 0)
-			{
-				for (int i = 0; i < m_nnd.activationSize; i++)
-				{
-					std::cout << re[i] << " ,";
-				}
-				std::cout << std::endl;
-			}
-		}
-		if (j % 100 == 0)
-		{
-			std::cout << std::endl;
+			//cudaMemcpy(result_compare, m_self_x[m_nndc.self_l]+1, sizeof(float), cudaMemcpyDeviceToHost);
+			//errormoy += abs(xor_result_data[i][0] - result_compare[0]);	
 		}
 		//errormoy = errormoy / 4.0f;
 		//std::cout << errormoy << std::endl;
@@ -205,17 +196,17 @@ void NeuralNetwork::propagate()
 	cudaDeviceProp deviceProp;
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
 
-	int layerStep = 2 + m_nnd.nb_col_hiden_layer;
-	m_nld.size = m_nnd.activationSize;
 	dim3 dimGrid;
-	dim3 dimBlock;
+	dim3 dimBlock;	
 
-	CNNHelper::KernelDispath(m_nld.size, &deviceProp, &dimGrid, &dimBlock);
-	for (int i = 0; i < layerStep - 1; i++)
+	for (int l = 1; l < m_nnd.nb_col_hiden_layer + 2;l++)
 	{
-		m_nld.layerId = i + 1;
-		cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
-		PropagateNeuralNetwork(dimGrid, dimBlock,m_nnd_Buffer, m_nld_Buffer, m_weight_buffer, m_activation_Buffer);
+		//m_nld.size = m_array_size_d[l] + 1;
+		//m_nld.l = l;
+		CNNHelper::KernelDispath(m_array_size_d[l]+1, &deviceProp, &dimGrid, &dimBlock);
+		//cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);		
+		PropagateNeuralNetwork(dimGrid,dimBlock, m_nld_Buffer, m_nndc_Buffer, m_self_d, m_self_w, m_self_x);
+
 	}
 }
 
@@ -232,27 +223,36 @@ void NeuralNetwork::backPropagate(std::vector<float> prediction_Data)
 
 	cudaDeviceProp deviceProp;
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
-
-	cudaStatus = cudaMemcpy(m_result_Buffer, prediction_Data.data(), sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyHostToDevice);
-	
-	if (cudaStatus != cudaSuccess)
+	/*
+	cudaMemcpy(m_activation, m_self_x[m_nndc.self_l], sizeof(float)* (m_array_size_d[m_nndc.self_l] + 1), cudaMemcpyDeviceToHost);
+	for (int j = 1; j < m_array_size_d[m_nndc.self_l] + 1; j++)
 	{
-		fprintf(stderr, "cudaMemcpy failed!");
-		return;
+		m_outDelta[j] = m_activation[j] - prediction_Data[j - 1];
+		if (m_nndc.is_classification)
+		{
+			m_outDelta[j] *= 1.0f - (m_activation[j]* m_activation[j]);
+		}
 	}
+	cudaMemcpy(m_self_delta[m_nndc.self_l]+1, m_outDelta+1, sizeof(float)* m_array_size_d[m_nndc.self_l], cudaMemcpyHostToDevice);
 
-	int layerStep = 2 + m_nnd.nb_col_hiden_layer;
-	m_nld.size = m_nnd.activationSize;
 	dim3 dimGrid;
 	dim3 dimBlock;
 
-	CNNHelper::KernelDispath(m_nld.size, &deviceProp, &dimGrid, &dimBlock);
-	for (int i = layerStep - 2; i >= -1; i--)
+	for (int l = m_nndc.self_l; l >= 2; l--)
 	{
-		m_nld.layerId = i + 1;
-		//std::cout << m_nld.layerId << " ,";
+		m_nld.size = m_array_size_d[l - 1] + 1;
+		CNNHelper::KernelDispath(m_nld.size, &deviceProp, &dimGrid, &dimBlock);
 		cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
-		BackPropagateNeuralNetwork(dimGrid, dimBlock,m_nnd_Buffer, m_nld_Buffer, m_weight_buffer, m_activation_Buffer, m_delta_Buffer, m_result_Buffer);
+		BackPropagateNeuralNetworkCompact(dimGrid, dimBlock, m_nld_Buffer, l, m_self_d, m_self_w, m_self_x, m_self_delta);
 	}
+
+	for (int l = 1; l < m_nndc.self_l+1; l++)
+	{
+		m_nld.size = m_array_size_d[l - 1] + 1;
+		CNNHelper::KernelDispath(m_nld.size, &deviceProp, &dimGrid, &dimBlock);
+		cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
+		BackPropagateNeuralNetworkCompactEnd(dimGrid, dimBlock, m_nld_Buffer, m_nndc_Buffer, l, m_self_d, m_self_w, m_self_x, m_self_delta);
+	}
+	*/
 	//std::cout << std::endl;
 }
