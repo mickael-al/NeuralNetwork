@@ -48,8 +48,7 @@ __global__ void initNeuralNetwork(const NeuralSwapData* nld, float* weight_buffe
 	weight_buffer[i] = curand_uniform(&state) * 2.0f - 1.0f;
 }
 
-
-__global__ void propagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, const float* weight_buffer, float* activation_Buffer)
+__global__ void propagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, float* weight_buffer, float* activation_Buffer)
 {
 	int index = blockIdx.x * blockDim.x + threadIdx.x;
 	if (index >= nld->size)
@@ -61,7 +60,7 @@ __global__ void propagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, cons
 		float sum = 0.0f;
 		for (int i = 0; i < nnd_Buffer->nb_input_layer; i++)
 		{
-			sum += activation_Buffer[i] * weight_buffer[((index - nnd_Buffer->nb_input_layer) * nnd_Buffer->nb_input_layer) + i];
+			sum += activation_Buffer[i] * weight_buffer[((index - nnd_Buffer->nb_input_layer) * nnd_Buffer->nb_input_layer) + i];			
 		}
 		activation_Buffer[index] = Tanh(sum);
 	}
@@ -74,7 +73,7 @@ __global__ void propagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, cons
 		float sum = 0.0f;
 		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
 		{
-			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[offsetWeight + minOffsetWeight + i];
+			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[offsetWeight + minOffsetWeight + i];			
 		}
 		activation_Buffer[index] = Tanh(sum);		
 	}
@@ -90,7 +89,6 @@ __global__ void propagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, cons
 			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[i + offsetWeight];
 		}
 		activation_Buffer[index] = Tanh(sum);
-
 	}
 }
 
@@ -105,7 +103,7 @@ __global__ void backPropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, 
 	if (index >= (nnd_Buffer->activationSize - nnd_Buffer->nb_output_layer) && nld->layerId == (2 + nnd_Buffer->nb_col_hiden_layer) - 1)
 	{
 		int offsetbaseNN = nnd_Buffer->nb_input_layer + (nld->layerId - 1) * nnd_Buffer->nb_hiden_layer;
-		delta_Buffer[index] = TanhDerive(activation_Buffer[index]) * (activation_Buffer[index] - result_Buffer[index - offsetbaseNN]);
+		delta_Buffer[index] = TanhDerive(activation_Buffer[index]) * (activation_Buffer[index] - result_Buffer[index - offsetbaseNN]);		
 	}
 	else if (nld->layerId == nnd_Buffer->nb_col_hiden_layer &&
 		index >= nnd_Buffer->nb_input_layer + (nld->layerId - 1) * nnd_Buffer->nb_hiden_layer &&
@@ -122,7 +120,7 @@ __global__ void backPropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, 
 		delta_Buffer[index] = TanhDerive(activation_Buffer[index]) * sum;
 		for (int i = 0; i < nnd_Buffer->nb_output_layer; i++)
 		{
-			weight_buffer[offsetWeight + minOffsetWeight + i * nnd_Buffer->nb_hiden_layer] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];			
+			weight_buffer[offsetWeight + minOffsetWeight + i * nnd_Buffer->nb_hiden_layer] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];						
 		}
 	}
 	else if (nld->layerId > 0 && nld->layerId < nnd_Buffer->nb_col_hiden_layer
@@ -141,7 +139,7 @@ __global__ void backPropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, 
 		delta_Buffer[index] = TanhDerive(activation_Buffer[index]) * sum;
 		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
 		{
-			weight_buffer[offsetWeight + minOffsetWeight + i * nnd_Buffer->nb_hiden_layer] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];			
+			weight_buffer[offsetWeight + minOffsetWeight + i * nnd_Buffer->nb_hiden_layer] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];						
 		}
 	}
 	else if (index < nnd_Buffer->nb_input_layer && nld->layerId == 0)
@@ -157,7 +155,7 @@ __global__ void backPropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, 
 		delta_Buffer[index] = TanhDerive(activation_Buffer[index]) * sum;
 		for (int i = 0; i < nnd_Buffer->nb_hiden_layer; i++)
 		{
-			weight_buffer[offsetWeight + i * nnd_Buffer->nb_input_layer] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];			
+			weight_buffer[offsetWeight + i * nnd_Buffer->nb_input_layer] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];						
 		}
 	}
 }
@@ -172,7 +170,7 @@ void InitNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralSwapData* nld, f
 	initNeuralNetwork<<<dimGrid, dimBlock>>>(nld, weight_buffer);
 }
 
-void PropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, const float* weight_buffer, float* activation_Buffer)
+void PropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, float* weight_buffer, float* activation_Buffer)
 {
 	propagateNeuralNetwork<<<dimGrid, dimBlock>>>(nnd_Buffer, nld, weight_buffer, activation_Buffer);
 }

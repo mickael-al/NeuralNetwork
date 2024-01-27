@@ -9,7 +9,7 @@
 
 void AddKernel(dim3 dimGrid, dim3 dimBlock,int* c, const int* a, const int* b, const int* size);
 void InitNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralSwapData* nld, float* weight_buffer);
-void PropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, const float* weight_buffer, float* activation_Buffer);
+void PropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, float* weight_buffer, float* activation_Buffer);
 void BackPropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralNetworkData* nnd_Buffer, const NeuralSwapData* nld, float* weight_buffer, float* activation_Buffer, float* delta_Buffer, float* result_Buffer);
 
 #endif // KERNEL_H

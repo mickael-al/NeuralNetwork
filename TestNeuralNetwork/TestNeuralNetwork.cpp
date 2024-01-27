@@ -47,10 +47,10 @@ int main()
     nnd.nb_col_hiden_layer = 4;
     nnd.nb_hiden_layer = 4;
     nnd.nb_output_layer = 1;
-    nnd.mutation_multiplayer = 0.05f;
+    nnd.mutation_multiplayer = 0.01f;
     NeuralNetwork * nn = createNeuralNetwork(nnd);        
     const std::string modelPath = "test";
-    //generateDataSet("D:/Projet/Cpp/CudaNeuralNetwork/DataSet", "D:/Projet/Cpp/CudaNeuralNetwork/DataSet/data.dataset");
+    //generateDataSet("C:/Users/micka/Documents/Projet/Cpp/NeuralNetwork/DataSet", "C:/Users/micka/Documents/Projet/Cpp/NeuralNetwork/DataSet/data.dataset");
     trainingNeuralNetwork(nn, modelPath);
     releaseNeuralNetwork(nn);
     return 0;
