@@ -14,8 +14,8 @@ __global__ void addKernel(int* c, const int* a, const int* b,const int * size)
 
 __device__ float Tanh(float x)
 {
-	return std::tanh(x);
-	/*if (x > 20.0)
+	//return std::tanh(x);
+	if (x > 20.0)
 	{
 		return 1.0;
 	}
@@ -27,7 +27,7 @@ __device__ float Tanh(float x)
 	{
 		float exp2x = exp(2 * x);
 		return (exp2x - 1) / (exp2x + 1);		
-	}*/
+	}
 }
 
 __device__ float TanhDerive(float x)
@@ -35,15 +35,9 @@ __device__ float TanhDerive(float x)
 	return 1.0f - (x*x);
 }
 
-__global__ void boug2000()
-{
-
-}
-
 __global__ void propagateNeuralNetworkCompact(const NeuralSwapData* nld, const NeuralNetworkDataCompact* nndc,const int * self_d, float*** self_w, float** self_x)
 {
 	int j = blockIdx.x * blockDim.x + threadIdx.x;
-	return;
 	if (j >= nld->size || j == 0)
 	{
 		return;
@@ -95,8 +89,7 @@ void AddKernel(dim3 dimGrid, dim3 dimBlock, int* c, const int* a, const int* b, 
 
 void PropagateNeuralNetwork(dim3 dimGrid, dim3 dimBlock, const NeuralSwapData* nld, const NeuralNetworkDataCompact* nndc, const int* self_d, float*** self_w, float** self_x)
 {
-	//propagateNeuralNetworkCompact <<<dimGrid, dimBlock >>> (nld, nndc, self_d, self_w,self_x);
-	boug2000 <<<dimGrid, dimBlock >>> ();
+	propagateNeuralNetworkCompact <<<dimGrid, dimBlock >>> (nld, nndc, self_d, self_w,self_x);
 }
 
 void BackPropagateNeuralNetworkCompact(dim3 dimGrid, dim3 dimBlock, const NeuralSwapData* nld, const int* self_d, float*** self_w,  float** self_x, float** self_delta)

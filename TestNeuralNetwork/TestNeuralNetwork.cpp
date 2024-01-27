@@ -44,10 +44,11 @@ int main()
     }
     NeuralNetworkData nnd{};
     nnd.nb_input_layer = 2;
-    nnd.nb_col_hiden_layer = 4;
-    nnd.nb_hiden_layer = 4;
+    nnd.nb_col_hiden_layer = 1;
+    nnd.nb_hiden_layer = 2000;
     nnd.nb_output_layer = 1;
     nnd.alpha = 0.01f;
+    nnd.is_classification = false;
     NeuralNetwork * nn = createNeuralNetwork(nnd);        
     const std::string modelPath = "test";
     //generateDataSet("C:/Users/micka/Documents/Projet/Cpp/NeuralNetwork/DataSet", "C:/Users/micka/Documents/Projet/Cpp/NeuralNetwork/DataSet/data.dataset");

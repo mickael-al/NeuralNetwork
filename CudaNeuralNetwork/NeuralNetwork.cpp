@@ -27,6 +27,7 @@ NeuralNetwork::NeuralNetwork(NeuralNetworkData nnd)
 	}
 	m_array_size_d[nnd.nb_col_hiden_layer + 1] = nnd.nb_output_layer;
 	m_nndc.self_l = nnd.nb_col_hiden_layer + 1;
+	m_nndc.alpha = nnd.alpha;
 	m_nndc.is_classification = nnd.is_classification;
 	std::srand(static_cast<unsigned int>(std::time(0)));	
 
@@ -79,7 +80,7 @@ NeuralNetwork::NeuralNetwork(NeuralNetworkData nnd)
 			}
 			else
 			{
-				m_self_x[l][j] = 2.0f;
+				m_self_x[l][j] = 0.0f;
 			}
 		}
 	}
@@ -150,7 +151,8 @@ void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
 	xor_result_data.push_back({ 1 });
 	xor_result_data.push_back({ 1 });
 	xor_result_data.push_back({ -1 });
-	float* result_compare = new float[1];
+//	float* result_compare = new float[1];
+	float* re = new float[1000000];
 	float errormoy = 0.0f;
 	for (int j = 0; j < 100001; j++)
 	{
@@ -159,9 +161,19 @@ void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
 		{			
 			cudaMemcpy(m_self_x[0]+1, xor_data[i].data(), sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
 			propagate();
-			//backPropagate(xor_result_data[i]);
+			backPropagate(xor_result_data[i]);
+			for (int k = 0; k < m_nndc.self_l+1; k++)
+			{
+				cudaMemcpy(re, m_self_x[k], sizeof(float)*(m_array_size_d[k]+1), cudaMemcpyDeviceToHost);
+				for (int l = 0; l < m_array_size_d[k] + 1; l++)
+				{
+					std::cout << re[l] << ", ";
+				}				
+				std::cout << "/";
+			}
+			std::cout << std::endl;
 			//cudaMemcpy(result_compare, m_self_x[m_nndc.self_l]+1, sizeof(float), cudaMemcpyDeviceToHost);
-			//errormoy += abs(xor_result_data[i][0] - result_compare[0]);	
+			//errormoy += abs(xor_result_data[i][0] - result_compare[0]);				
 		}
 		//errormoy = errormoy / 4.0f;
 		//std::cout << errormoy << std::endl;
@@ -201,12 +213,12 @@ void NeuralNetwork::propagate()
 
 	for (int l = 1; l < m_nnd.nb_col_hiden_layer + 2;l++)
 	{
-		//m_nld.size = m_array_size_d[l] + 1;
-		//m_nld.l = l;
+		m_nld.size = m_array_size_d[l] + 1;
+		m_nld.l = l;
 		CNNHelper::KernelDispath(m_array_size_d[l]+1, &deviceProp, &dimGrid, &dimBlock);
-		//cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);		
+		cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);		
 		PropagateNeuralNetwork(dimGrid,dimBlock, m_nld_Buffer, m_nndc_Buffer, m_self_d, m_self_w, m_self_x);
-
+		cudaDeviceSynchronize();
 	}
 }
 
@@ -223,7 +235,7 @@ void NeuralNetwork::backPropagate(std::vector<float> prediction_Data)
 
 	cudaDeviceProp deviceProp;
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
-	/*
+	
 	cudaMemcpy(m_activation, m_self_x[m_nndc.self_l], sizeof(float)* (m_array_size_d[m_nndc.self_l] + 1), cudaMemcpyDeviceToHost);
 	for (int j = 1; j < m_array_size_d[m_nndc.self_l] + 1; j++)
 	{
@@ -241,18 +253,21 @@ void NeuralNetwork::backPropagate(std::vector<float> prediction_Data)
 	for (int l = m_nndc.self_l; l >= 2; l--)
 	{
 		m_nld.size = m_array_size_d[l - 1] + 1;
+		m_nld.l = l;
 		CNNHelper::KernelDispath(m_nld.size, &deviceProp, &dimGrid, &dimBlock);
 		cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
-		BackPropagateNeuralNetworkCompact(dimGrid, dimBlock, m_nld_Buffer, l, m_self_d, m_self_w, m_self_x, m_self_delta);
+		BackPropagateNeuralNetworkCompact(dimGrid, dimBlock, m_nld_Buffer, m_self_d, m_self_w, m_self_x, m_self_delta);
+		cudaDeviceSynchronize();
 	}
 
 	for (int l = 1; l < m_nndc.self_l+1; l++)
 	{
 		m_nld.size = m_array_size_d[l - 1] + 1;
+		m_nld.l = l;
 		CNNHelper::KernelDispath(m_nld.size, &deviceProp, &dimGrid, &dimBlock);
 		cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
-		BackPropagateNeuralNetworkCompactEnd(dimGrid, dimBlock, m_nld_Buffer, m_nndc_Buffer, l, m_self_d, m_self_w, m_self_x, m_self_delta);
+		BackPropagateNeuralNetworkCompactEnd(dimGrid, dimBlock, m_nld_Buffer, m_nndc_Buffer, m_self_d, m_self_w, m_self_x, m_self_delta);
+		cudaDeviceSynchronize();
 	}
-	*/
 	//std::cout << std::endl;
 }
