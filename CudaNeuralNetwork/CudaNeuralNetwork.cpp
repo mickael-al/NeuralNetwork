@@ -21,9 +21,58 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
     return new NeuralNetwork(nnd);
 }
 
-void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath)
+std::map<const std::string, std::vector<float*>> charger(const std::string& nom_fichier, int* size)
 {
-    nn->trainingDataSet(dataSetPath);
+    std::map<const std::string, std::vector<float*>> donnees;
+    std::ifstream fichier(nom_fichier, std::ios::binary);
+    if (fichier.is_open())
+    {
+        // Lecture de la taille de la map
+        size_t taille_map;
+        size_t image_size;
+        fichier.read(reinterpret_cast<char*>(&taille_map), sizeof(size_t));
+        fichier.read(reinterpret_cast<char*>(&image_size), sizeof(size_t));
+        *size = image_size;
+        // Lecture des données pour chaque paire clé-valeur dans la map
+        for (size_t i = 0; i < taille_map; ++i) {
+            // Lecture de la taille de la clé
+            size_t taille_cle;
+            fichier.read(reinterpret_cast<char*>(&taille_cle), sizeof(size_t));
+            // Lecture de la clé
+            char* cle = new char[taille_cle + 1];
+            fichier.read(cle, taille_cle);
+            cle[taille_cle] = '\0';
+
+            // Lecture de la taille du vecteur
+            size_t taille_vecteur;
+            fichier.read(reinterpret_cast<char*>(&taille_vecteur), sizeof(size_t));
+
+            // Lecture des données float du vecteur
+            std::vector<float*> vecteur;
+            for (size_t j = 0; j < taille_vecteur; ++j) {
+                float* valeur = new float[image_size * image_size * 3];
+                fichier.read(reinterpret_cast<char*>(valeur), sizeof(float) * image_size * image_size * 3);
+                vecteur.push_back(valeur);
+            }
+
+            // Stockage des données dans la map
+            donnees[std::string(cle)] = vecteur;
+            delete[] cle;
+        }
+        fichier.close();
+        std::cout << "Données chargées avec succès depuis " << nom_fichier << std::endl;
+    }
+    else {
+        std::cerr << "Impossible d'ouvrir le fichier pour chargement." << std::endl;
+    }
+    return donnees;
+}
+
+void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, float min_percent_error_train)
+{
+    int size;
+    std::map<const std::string, std::vector<float*>> data = charger(dataSetPath,&size);
+    nn->trainingDataSet(data, size, min_percent_error_train);
 }
 
 void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, float min_percent_error_train)
@@ -78,7 +127,7 @@ void getArborescence(const fs::path& chemin, const fs::path& basePath, std::map<
     }
 }
 
-void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, const std::string& nom_fichier,int size) 
+void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, const std::string& nom_fichier, size_t image_size)
 {
     std::ofstream fichier(nom_fichier, std::ios::binary);
     if (fichier.is_open()) 
@@ -86,7 +135,8 @@ void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, c
         // Écriture de la taille de la map
         size_t taille_map = data.size();
         fichier.write(reinterpret_cast<const char*>(&taille_map), sizeof(size_t));
-
+        // Taille d'une image 
+        fichier.write(reinterpret_cast<const char*>(&image_size), sizeof(size_t));
         // Pour chaque paire clé-valeur dans la map
         for (const auto& paire : data) 
         {
@@ -103,7 +153,7 @@ void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, c
             // Écriture des données float du vecteur
             for (size_t i = 0; i < taille_vecteur; ++i) 
             {
-                fichier.write(reinterpret_cast<const char*>(paire.second[i]), sizeof(float)* size * size *3);
+                fichier.write(reinterpret_cast<const char*>(paire.second[i]), sizeof(float)* image_size * image_size *3);
             }
         }
         fichier.close();
@@ -112,51 +162,6 @@ void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, c
     else {
         std::cerr << "Impossible d'ouvrir le fichier pour sauvegarde." << std::endl;
     }
-}
-
-std::map<const std::string, std::vector<float*>> charger(const std::string& nom_fichier,int size) 
-{
-    std::map<const std::string, std::vector<float*>> donnees;
-    std::ifstream fichier(nom_fichier, std::ios::binary);
-    if (fichier.is_open()) 
-    {
-        // Lecture de la taille de la map
-        size_t taille_map;
-        fichier.read(reinterpret_cast<char*>(&taille_map), sizeof(size_t));
-
-        // Lecture des données pour chaque paire clé-valeur dans la map
-        for (size_t i = 0; i < taille_map; ++i) {
-            // Lecture de la taille de la clé
-            size_t taille_cle;
-            fichier.read(reinterpret_cast<char*>(&taille_cle), sizeof(size_t));
-            // Lecture de la clé
-            char* cle = new char[taille_cle + 1];
-            fichier.read(cle, taille_cle);
-            cle[taille_cle] = '\0';
-
-            // Lecture de la taille du vecteur
-            size_t taille_vecteur;
-            fichier.read(reinterpret_cast<char*>(&taille_vecteur), sizeof(size_t));
-
-            // Lecture des données float du vecteur
-            std::vector<float*> vecteur;
-            for (size_t j = 0; j < taille_vecteur; ++j) {
-                float* valeur = new float[size * size *3];
-                fichier.read(reinterpret_cast<char*>(valeur), sizeof(float)* size * size * 3);
-                vecteur.push_back(valeur);
-            }
-
-            // Stockage des données dans la map
-            donnees[std::string(cle)] = vecteur;
-            delete[] cle;
-        }
-        fichier.close();
-        std::cout << "Données chargées avec succès depuis " << nom_fichier << std::endl;
-    }
-    else {
-        std::cerr << "Impossible d'ouvrir le fichier pour chargement." << std::endl;
-    }
-    return donnees;
 }
 
 void generateDataSet(const std::string& path, const std::string& dataSetSavepath,int image_data_size)

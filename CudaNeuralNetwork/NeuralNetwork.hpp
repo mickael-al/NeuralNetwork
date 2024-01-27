@@ -5,13 +5,14 @@
 #include <vector>
 #include "NeuralNetworkData.hpp"
 #include "NeuralSwapData.hpp"
+#include <map>
 
 class NeuralNetwork
 {
 public:
 	NeuralNetwork(NeuralNetworkData nnd);
 	~NeuralNetwork();
-	void trainingDataSet(const std::string& dataSetPath);
+	void trainingDataSet(const std::map<const std::string, std::vector<float*>>& data, int input_size,float min_percent_error_train);
 	void trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, float min_percent_error_train);
 	void loadModel(const std::string& modelPath);
 	void setInputData(const std::vector<double>& inputData);

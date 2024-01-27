@@ -1,12 +1,18 @@
-﻿  CudaNeuralNetwork.cpp
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(315,1): warning C4533: l'initialisation de 'dimBlock' est ignorée par 'goto Error'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(289): message : voir la déclaration de 'dimBlock'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(315): message : voir la déclaration de 'Error'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(315,1): warning C4533: l'initialisation de 'dimGrid' est ignorée par 'goto Error'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(288): message : voir la déclaration de 'dimGrid'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(315): message : voir la déclaration de 'Error'
-  ImageData.cpp
-  Génération de code en cours...
-     Création de la bibliothèque D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\CudaNeuralNetwork.lib et de l'objet D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\CudaNeuralNetwork.exp
-LINK : warning LNK4098: conflit entre la bibliothèque par défaut 'LIBCMT' et les autres bibliothèques ; utilisez /NODEFAULTLIB:library
+﻿  NeuralNetwork.cpp
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(150,19): warning C4477: 'fprintf' : la chaîne de format '%d' nécessite un argument de type 'int', mais l'argument variadique 1 est de type 'unsigned __int64'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(150,19): message : utilisez '%zd' dans la chaîne de format
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(150,19): warning C4477: 'fprintf' : la chaîne de format '%d' nécessite un argument de type 'int', mais l'argument variadique 2 est de type 'unsigned __int64'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(150,19): message : utilisez '%zd' dans la chaîne de format
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(157,20): warning C4477: 'fprintf' : la chaîne de format '%d' nécessite un argument de type 'int', mais l'argument variadique 2 est de type 'unsigned __int64'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(157,20): message : utilisez '%zd' dans la chaîne de format
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(162,20): warning C4477: 'fprintf' : la chaîne de format '%d' nécessite un argument de type 'int', mais l'argument variadique 2 est de type 'unsigned __int64'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(162,20): message : utilisez '%zd' dans la chaîne de format
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(207,19): warning C4477: 'fprintf' : la chaîne de format '%d' nécessite un argument de type 'int', mais l'argument variadique 1 est de type 'unsigned __int64'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(207,19): message : utilisez '%zd' dans la chaîne de format
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(232,36): warning C4267: '+=' : conversion de 'size_t' en 'int', perte possible de données
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\NeuralNetwork.cpp(239,19): warning C4244: 'argument' : conversion de 'int' en '_Ty', perte possible de données
+          with
+          [
+              _Ty=float
+          ]
   CudaNeuralNetwork.vcxproj -> D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\CudaNeuralNetwork.dll

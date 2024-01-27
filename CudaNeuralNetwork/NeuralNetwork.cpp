@@ -187,10 +187,10 @@ void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, c
 			cudaMemcpy(result_compare, m_self_x[m_nndc.self_l] + 1, sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
 			for (int l = 0; l < m_nnd.nb_output_layer; l++)
 			{
-				errormoy += abs(output[i][l] - result_compare[l]);
+				errormoy += abs(output[i][l] - result_compare[l]) * (1.0f/ m_nnd.nb_output_layer);
 			}
 		}
-		errormoy = errormoy / 4.0f;
+		errormoy = errormoy / input.size();
 		std::cout << "Error: " << errormoy * 100.0f << "%" << std::endl;
 		if (errormoy*100.0f < min_percent_error_train)
 		{
@@ -200,8 +200,18 @@ void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, c
 	delete[] result_compare;
 }
 
-void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
+void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vector<float*>> & data,int input_size, float min_percent_error_train)
 {
+	if (data.size() != m_nnd.nb_output_layer)
+	{
+		fprintf(stderr, "data size : %d not equal to output size : %d", data.size(), m_nnd.nb_output_layer);
+		return;
+	}
+	if (input_size != m_nnd.nb_input_layer)
+	{
+		fprintf(stderr, "input_size image : %d not equal to input layer size : %d", input_size, m_nnd.nb_input_layer);
+		return;
+	}
 	cudaError_t cudaStatus;
 	cudaStatus = cudaSetDevice(0);
 	if (cudaStatus != cudaSuccess)
@@ -212,6 +222,59 @@ void NeuralNetwork::trainingDataSet(const std::string& dataSetPath)
 
 	cudaDeviceProp deviceProp;
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
+	float errormoy = 0.0f;
+	int gardeFou = 100001;
+	float* result_compare = new float[m_nnd.nb_output_layer];
+	std::vector<std::vector<float>> output;
+	int totalDivideError = 0;
+	for (std::pair<const std::string, std::vector<float*>> d : data)
+	{
+		totalDivideError+=d.second.size();
+	}
+	for (int i = 0; i < data.size(); i++)
+	{
+		std::vector<float> co;		
+		for (int j = 0; j < data.size(); j++)
+		{
+			co.push_back(i == j ? 1 : 0);
+		}
+		output.push_back(co);
+	}
+	for (int j = 0; j < gardeFou; j++)
+	{		
+		errormoy = 0.0f;
+		int countData = 0;
+		for (std::pair<const std::string, std::vector<float*>> d : data)
+		{			
+			int currentd = 0;
+			for (float* ptr : d.second) 
+			{				
+				cudaMemcpy(m_self_x[0] + 1, ptr, sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
+				propagate();
+				backPropagate(output[countData]);
+				cudaMemcpy(result_compare, m_self_x[m_nndc.self_l] + 1, sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
+				for (int l = 0; l < m_nnd.nb_output_layer; l++)
+				{
+					errormoy += abs(output[countData][l] - result_compare[l]) * (1.0f/ m_nnd.nb_output_layer);					
+				}
+				if (currentd % 100 == 0)
+				{
+					std::cout << "Image : " << currentd << " Errormoy : " << errormoy << std::endl;
+				}
+				currentd++;
+			}
+			countData++;
+		}	
+		errormoy = errormoy / totalDivideError;
+		std::cout << "Error: " << errormoy * 100.0f << "%" << std::endl;
+		if (errormoy * 100.0f < min_percent_error_train)
+		{
+			j = gardeFou;
+			delete[] result_compare;
+			return;
+		}
+	}
+	delete[] result_compare;
 }
 
 void NeuralNetwork::loadModel(const std::string& modelPath)
