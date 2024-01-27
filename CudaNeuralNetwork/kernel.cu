@@ -15,7 +15,7 @@ __global__ void addKernel(int* c, const int* a, const int* b,const int * size)
 
 __device__ float Tanh(float x)
 {
-	//return std::tanh(x);
+	return std::tanh(x);
 	if (x > 20.0)
 	{
 		return 1.0;
@@ -62,7 +62,14 @@ __global__ void propagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, cons
 		{
 			sum += activation_Buffer[i] * weight_buffer[((index - nnd_Buffer->nb_input_layer) * nnd_Buffer->nb_input_layer) + i];			
 		}
-		activation_Buffer[index] = Tanh(sum);
+		if (index == nnd_Buffer->nb_input_layer + nnd_Buffer->nb_hiden_layer - 1)
+		{
+			activation_Buffer[index] = 1.0;
+		}
+		else
+		{
+			activation_Buffer[index] = Tanh(sum);
+		}
 	}
 	else if (index >= (nnd_Buffer->activationSize - nnd_Buffer->nb_output_layer) && nld->layerId == (2 + nnd_Buffer->nb_col_hiden_layer) - 1)
 	{
@@ -75,7 +82,14 @@ __global__ void propagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, cons
 		{
 			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[offsetWeight + minOffsetWeight + i];			
 		}
-		activation_Buffer[index] = Tanh(sum);		
+		if (index == nnd_Buffer->activationSize - 1)
+		{
+			activation_Buffer[index] = 1.0;
+		}
+		else
+		{
+			activation_Buffer[index] = Tanh(sum);
+		}
 	}
 	else if (nld->layerId > 1 && nld->layerId < (2 + nnd_Buffer->nb_col_hiden_layer) - 1
 		&& index >= nnd_Buffer->nb_input_layer + (nld->layerId-1) * nnd_Buffer->nb_hiden_layer
@@ -88,7 +102,14 @@ __global__ void propagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, cons
 		{
 			sum += activation_Buffer[i + offsetbaseNN] * weight_buffer[i + offsetWeight];
 		}
-		activation_Buffer[index] = Tanh(sum);
+		if (index == (nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer) - 1)
+		{
+			activation_Buffer[index] = 1;
+		}
+		else
+		{
+			activation_Buffer[index] = Tanh(sum);
+		}
 	}
 }
 
@@ -107,7 +128,7 @@ __global__ void backPropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, 
 	}
 	else if (nld->layerId == nnd_Buffer->nb_col_hiden_layer &&
 		index >= nnd_Buffer->nb_input_layer + (nld->layerId - 1) * nnd_Buffer->nb_hiden_layer &&
-		index < nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer)
+		index < (nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer)-1)
 	{
 		int offsetDelta = nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer;//18
 		int offsetWeight = nnd_Buffer->nb_input_layer * nnd_Buffer->nb_hiden_layer + (nld->layerId - 1) * nnd_Buffer->nb_hiden_layer * nnd_Buffer->nb_hiden_layer;//56
@@ -125,7 +146,7 @@ __global__ void backPropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, 
 	}
 	else if (nld->layerId > 0 && nld->layerId < nnd_Buffer->nb_col_hiden_layer
 		&& index >= nnd_Buffer->nb_input_layer + (nld->layerId-1) * nnd_Buffer->nb_hiden_layer
-		&& index < nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer)
+		&& index < (nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer)-1)
 	{
 		int nblayer = 1 + nnd_Buffer->nb_col_hiden_layer;//5
 		int offsetDelta = nnd_Buffer->nb_input_layer + nld->layerId * nnd_Buffer->nb_hiden_layer;//10
@@ -142,7 +163,7 @@ __global__ void backPropagateNeuralNetwork(const NeuralNetworkData* nnd_Buffer, 
 			weight_buffer[offsetWeight + minOffsetWeight + i * nnd_Buffer->nb_hiden_layer] -= nnd_Buffer->mutation_multiplayer * activation_Buffer[index] * delta_Buffer[index];						
 		}
 	}
-	else if (index < nnd_Buffer->nb_input_layer && nld->layerId == 0)
+	else if (index < nnd_Buffer->nb_input_layer-1 && nld->layerId == 0)
 	{
 		int nblayer = 1 + nnd_Buffer->nb_col_hiden_layer;//5
 		int offsetDelta = nnd_Buffer->nb_input_layer;//2
