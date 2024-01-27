@@ -67,15 +67,15 @@ ImageData::ImageData(const char * file_name)
     m_isload = true;
 }
 
-void ImageData::resizeTo256()
+void ImageData::resize(int size)
 {
     int max = (m_width > m_height) ? m_width : m_height;
-    float reveretRatio = (float)max/ 256.0f;
+    float reveretRatio = (float)max/ size;
 
-    Color** ncolor = new Color * [256];
-    for (int i = 0; i < 256; i++)
+    Color** ncolor = new Color * [size];
+    for (int i = 0; i < size; i++)
     {
-        ncolor[i] = new Color[256];
+        ncolor[i] = new Color[size];
     }
 
     for (float i = 0; (int)i < m_height; i+= reveretRatio)
@@ -91,8 +91,8 @@ void ImageData::resizeTo256()
     }
     delete[] m_color;
     m_color = ncolor;
-    m_width = 256;
-    m_height = 256;
+    m_width = size;
+    m_height = size;
 }
 
 Color** ImageData::getColor() const 

@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\x64\Debug\TestNeuralNetwork.exe</FullPath>
+      <FullPath>D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\TestNeuralNetwork.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

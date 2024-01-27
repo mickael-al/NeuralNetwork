@@ -26,12 +26,17 @@ void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath)
     nn->trainingDataSet(dataSetPath);
 }
 
+void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, float min_percent_error_train)
+{
+    nn->trainingInput(input, output, min_percent_error_train);
+}
+
 void releaseNeuralNetwork(NeuralNetwork* network)
 {
     delete network;
 }
 
-void getArborescence(const fs::path& chemin, const fs::path& basePath, std::map<const std::string, std::vector<stbimg>> * data)
+void getArborescence(const fs::path& chemin, const fs::path& basePath, std::map<const std::string, std::vector<stbimg>> * data,int size)
 {
     if (fs::is_directory(chemin)) 
     {
@@ -43,15 +48,15 @@ void getArborescence(const fs::path& chemin, const fs::path& basePath, std::map<
                 if (extension == ".jpg" || extension == ".png") 
                 {                    
                     ImageData* id = new ImageData(entry.path().string().c_str());
-                    if (id->getHeight() < 256 && id->getWidth() < 256)
+                    if (id->getHeight() < size && id->getWidth() < size)
                     {
                         fs::remove(entry.path());
                         std::cout << " remove -> "  << entry.path() << std::endl;
                     }
-                    else if(id->getHeight() != 256 || id->getWidth() != 256)
+                    else if(id->getHeight() != size || id->getWidth() != size)
                     {
                         std::cout << " modify -> " << entry.path() << std::endl;
-                        id->resizeTo256();
+                        id->resize(size);
                         id->write();                        
                     }
                     else
@@ -67,13 +72,13 @@ void getArborescence(const fs::path& chemin, const fs::path& basePath, std::map<
             }
             if (fs::is_directory(entry.path())) 
             {
-                getArborescence(entry.path(), basePath, data);
+                getArborescence(entry.path(), basePath, data, size);
             }
         }
     }
 }
 
-void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, const std::string& nom_fichier) 
+void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, const std::string& nom_fichier,int size) 
 {
     std::ofstream fichier(nom_fichier, std::ios::binary);
     if (fichier.is_open()) 
@@ -98,7 +103,7 @@ void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, c
             // Écriture des données float du vecteur
             for (size_t i = 0; i < taille_vecteur; ++i) 
             {
-                fichier.write(reinterpret_cast<const char*>(paire.second[i]), sizeof(float)*256*256*3);
+                fichier.write(reinterpret_cast<const char*>(paire.second[i]), sizeof(float)* size * size *3);
             }
         }
         fichier.close();
@@ -109,7 +114,7 @@ void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, c
     }
 }
 
-std::map<const std::string, std::vector<float*>> charger(const std::string& nom_fichier) 
+std::map<const std::string, std::vector<float*>> charger(const std::string& nom_fichier,int size) 
 {
     std::map<const std::string, std::vector<float*>> donnees;
     std::ifstream fichier(nom_fichier, std::ios::binary);
@@ -136,8 +141,8 @@ std::map<const std::string, std::vector<float*>> charger(const std::string& nom_
             // Lecture des données float du vecteur
             std::vector<float*> vecteur;
             for (size_t j = 0; j < taille_vecteur; ++j) {
-                float* valeur = new float[256*256*3];
-                fichier.read(reinterpret_cast<char*>(valeur), sizeof(float)* 256 * 256 * 3);
+                float* valeur = new float[size * size *3];
+                fichier.read(reinterpret_cast<char*>(valeur), sizeof(float)* size * size * 3);
                 vecteur.push_back(valeur);
             }
 
@@ -154,11 +159,11 @@ std::map<const std::string, std::vector<float*>> charger(const std::string& nom_
     return donnees;
 }
 
-void generateDataSet(const std::string& path, const std::string& dataSetSavepath)
+void generateDataSet(const std::string& path, const std::string& dataSetSavepath,int image_data_size)
 {
     std::map<const std::string, std::vector<stbimg>> m_map_dataset;
     std::cout << "load Image" << std::endl;
-    getArborescence(path, path, &m_map_dataset);
+    getArborescence(path, path, &m_map_dataset, image_data_size);
     std::cout << "Compute ThanH Image" << std::endl;
     std::map<const std::string, std::vector<float*>> data;
     for (const auto& pair : m_map_dataset) 
@@ -166,7 +171,7 @@ void generateDataSet(const std::string& path, const std::string& dataSetSavepath
         std::vector<float*> d;
         for (const auto& value : pair.second) 
         {
-            float* col = new float[256 * 256 * 3];
+            float* col = new float[image_data_size * image_data_size * 3];
 
             int offset = 0;
             int offset2 = 0;
@@ -203,7 +208,7 @@ void generateDataSet(const std::string& path, const std::string& dataSetSavepath
         std::cout << std::endl;
     }
     std::cout << "Save" << std::endl;
-    sauvegarder(data, dataSetSavepath);
+    sauvegarder(data, dataSetSavepath, image_data_size);
     std::cout << "Finish" << std::endl;
 }
 

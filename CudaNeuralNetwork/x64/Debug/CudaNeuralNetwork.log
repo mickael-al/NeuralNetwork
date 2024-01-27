@@ -1,2 +1,12 @@
-﻿  NeuralNetwork.cpp
+﻿  CudaNeuralNetwork.cpp
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(315,1): warning C4533: l'initialisation de 'dimBlock' est ignorée par 'goto Error'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(289): message : voir la déclaration de 'dimBlock'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(315): message : voir la déclaration de 'Error'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(315,1): warning C4533: l'initialisation de 'dimGrid' est ignorée par 'goto Error'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(288): message : voir la déclaration de 'dimGrid'
+D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(315): message : voir la déclaration de 'Error'
+  ImageData.cpp
+  Génération de code en cours...
+     Création de la bibliothèque D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\CudaNeuralNetwork.lib et de l'objet D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\CudaNeuralNetwork.exp
+LINK : warning LNK4098: conflit entre la bibliothèque par défaut 'LIBCMT' et les autres bibliothèques ; utilisez /NODEFAULTLIB:library
   CudaNeuralNetwork.vcxproj -> D:\Projet\Cpp\CudaNeuralNetwork\x64\Debug\CudaNeuralNetwork.dll

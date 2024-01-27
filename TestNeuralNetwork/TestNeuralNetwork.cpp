@@ -9,27 +9,10 @@ int main()
     {
         return 1;
     }
-
-    /*const int arraySize = 5;
-    const int a[arraySize] = { 1, 2, 3, 4, 5 };
-    const int b[arraySize] = { 10, 20, 30, 40, 50 };
-    int c[arraySize] = { 0 };
-    AddWithCudaFunc addWithCuda = (AddWithCudaFunc)GetProcAddress(hDll, "addWithCuda");
-    if (addWithCuda == NULL)
-    {
-        std::cerr << "addWithCuda not found" << std::endl;
-        return 1;
-    }
-
-    addWithCuda(c, a, b, arraySize);
-    for (int i = 0; i < arraySize; i++)
-    {
-        std::cout << c[i] << " ";
-    }
-    std::cout << std::endl;*/
     
     CreateNeuralNetwork createNeuralNetwork = (CreateNeuralNetwork)GetProcAddress(hDll, "createNeuralNetwork");
     ReleaseNeuralNetwork releaseNeuralNetwork = (ReleaseNeuralNetwork)GetProcAddress(hDll, "releaseNeuralNetwork");
+    TrainingNeuralNetworkInput trainingNeuralNetworkInput = (TrainingNeuralNetworkInput)GetProcAddress(hDll, "trainingNeuralNetworkInput");
     TrainingNeuralNetwork trainingNeuralNetwork = (TrainingNeuralNetwork)GetProcAddress(hDll, "trainingNeuralNetwork");
     GenerateDataSet generateDataSet = (GenerateDataSet)GetProcAddress(hDll, "generateDataSet");
     if (createNeuralNetwork == NULL)
@@ -42,17 +25,28 @@ int main()
         std::cerr << "releaseNeuralNetwork not found" << std::endl;
         return 1;
     }
-    NeuralNetworkData nnd{};
-    nnd.nb_input_layer = 2;
-    nnd.nb_col_hiden_layer = 1;
-    nnd.nb_hiden_layer = 2000;
+    const std::string modelPath = "../DataSet/data.dataset";
+    //generateDataSet("../DataSet", modelPath, 256);
+
+    /*NeuralNetworkData nnd{};
+    nnd.nb_input_layer = 4;
+    nnd.nb_col_hiden_layer = 2;
+    nnd.nb_hiden_layer = 10;
     nnd.nb_output_layer = 1;
     nnd.alpha = 0.01f;
     nnd.is_classification = false;
-    NeuralNetwork * nn = createNeuralNetwork(nnd);        
-    const std::string modelPath = "test";
-    //generateDataSet("C:/Users/micka/Documents/Projet/Cpp/NeuralNetwork/DataSet", "C:/Users/micka/Documents/Projet/Cpp/NeuralNetwork/DataSet/data.dataset");
-    trainingNeuralNetwork(nn, modelPath);
-    releaseNeuralNetwork(nn);
+    NeuralNetwork * nn = createNeuralNetwork(nnd);   */     
+    /*std::vector<std::vector<float>> xor_data;
+    xor_data.push_back({ 0,0,0,0 });
+    xor_data.push_back({ 1,0,0,0 });
+    xor_data.push_back({ 0,1,0,0 });
+    xor_data.push_back({ 1,1,0,0 });
+    std::vector<std::vector<float>> xor_result_data;
+    xor_result_data.push_back({ -1 });
+    xor_result_data.push_back({ 1 });
+    xor_result_data.push_back({ 1 });
+    xor_result_data.push_back({ -1 });
+    trainingNeuralNetworkInput(nn, xor_data, xor_result_data,1.0f);
+    releaseNeuralNetwork(nn);*/
     return 0;
 }

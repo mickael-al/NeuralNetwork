@@ -12,6 +12,7 @@ public:
 	NeuralNetwork(NeuralNetworkData nnd);
 	~NeuralNetwork();
 	void trainingDataSet(const std::string& dataSetPath);
+	void trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, float min_percent_error_train);
 	void loadModel(const std::string& modelPath);
 	void setInputData(const std::vector<double>& inputData);
 	void saveModel(const std::string& modelPath);

@@ -25,7 +25,7 @@ public:
 	int getChannelCount() const;
 	bool isLoad() const;//isload
 	void write();
-	void resizeTo256();
+	void resize(int size);
 	std::string getPath() const;
 	static stbimg loadData(const std::string path);
 	static void freeData(stbimg stbi);
