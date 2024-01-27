@@ -216,6 +216,7 @@ void NeuralNetwork::propagate()
 		m_nld.layerId = i + 1;
 		cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
 		PropagateNeuralNetwork(dimGrid, dimBlock,m_nnd_Buffer, m_nld_Buffer, m_weight_buffer, m_activation_Buffer);
+		cudaDeviceSynchronize();
 	}
 }
 
@@ -252,5 +253,6 @@ void NeuralNetwork::backPropagate(std::vector<float> prediction_Data)
 		m_nld.layerId = i + 1;
 		cudaMemcpy(m_nld_Buffer, &m_nld, sizeof(NeuralSwapData), cudaMemcpyHostToDevice);
 		BackPropagateNeuralNetwork(dimGrid, dimBlock,m_nnd_Buffer, m_nld_Buffer, m_weight_buffer, m_activation_Buffer, m_delta_Buffer, m_result_Buffer);
+		cudaDeviceSynchronize();
 	}
 }
