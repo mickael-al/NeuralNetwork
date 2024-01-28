@@ -207,9 +207,9 @@ void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vecto
 		fprintf(stderr, "data size : %d not equal to output size : %d", data.size(), m_nnd.nb_output_layer);
 		return;
 	}
-	if (input_size != m_nnd.nb_input_layer)
+	if (input_size* input_size != m_nnd.nb_input_layer)
 	{
-		fprintf(stderr, "input_size image : %d not equal to input layer size : %d", input_size, m_nnd.nb_input_layer);
+		fprintf(stderr, "input_size image : %d not equal to input layer size : %d", input_size * input_size, m_nnd.nb_input_layer);
 		return;
 	}
 	cudaError_t cudaStatus;
@@ -236,9 +236,11 @@ void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vecto
 		std::vector<float> co;		
 		for (int j = 0; j < data.size(); j++)
 		{
-			co.push_back(i == j ? 1 : 0);
+			co.push_back(i == j ? 1.0f : -1.0f);
+			std::cout << co[j] << ", ";
 		}
 		output.push_back(co);
+		std::cout << std::endl;
 	}
 	for (int j = 0; j < gardeFou; j++)
 	{		
@@ -257,7 +259,7 @@ void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vecto
 				{
 					errormoy += abs(output[countData][l] - result_compare[l]) * (1.0f/ m_nnd.nb_output_layer);					
 				}
-				if (currentd % 100 == 0)
+				if (currentd % 50 == 0)
 				{
 					std::cout << "Image : " << currentd << " Errormoy : " << errormoy << std::endl;
 				}
