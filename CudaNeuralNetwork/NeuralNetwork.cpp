@@ -259,7 +259,7 @@ void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vecto
 				{
 					errormoy += abs(output[countData][l] - result_compare[l]) * (1.0f/ m_nnd.nb_output_layer);					
 				}
-				if (currentd % 50 == 0)
+				if (currentd % 10 == 0)
 				{
 					std::cout << "Image : " << currentd << " Errormoy : " << errormoy << std::endl;
 				}

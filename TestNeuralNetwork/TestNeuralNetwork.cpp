@@ -25,17 +25,17 @@ int main()
         std::cerr << "releaseNeuralNetwork not found" << std::endl;
         return 1;
     }
-    const int image_size = 256;
+    const int image_size = 128;
     const std::string modelPath = "../DataSet/data.dataset";
     //generateDataSet("../DataSet", modelPath, image_size);
-
+    
     NeuralNetworkData nnd{};
     nnd.nb_input_layer = image_size * image_size;
-    nnd.nb_col_hiden_layer = 5;
+    nnd.nb_col_hiden_layer = 8;
     nnd.nb_hiden_layer = 64;
     nnd.nb_output_layer = 3;
-    nnd.alpha = 0.01f;
-    nnd.is_classification = true;
+    nnd.alpha = 0.001f;
+    nnd.is_classification = false;
     NeuralNetwork* nn = createNeuralNetwork(nnd);
     trainingNeuralNetwork(nn, modelPath, 1.0f);
     releaseNeuralNetwork(nn);
