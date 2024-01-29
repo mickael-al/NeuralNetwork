@@ -6,6 +6,8 @@
 #include "kernel.h"
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
+#include <algorithm>
 
 NeuralNetwork::NeuralNetwork(NeuralNetworkData nnd)
 {
@@ -143,6 +145,68 @@ NeuralNetwork::~NeuralNetwork()
 	cudaFree(m_nndc_Buffer);	
 }
 
+void NeuralNetwork::useInputImage(float* col, std::vector<float>* output)
+{
+	output->clear();
+	cudaError_t cudaStatus;
+	cudaStatus = cudaSetDevice(0);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+		return;
+	}
+
+	cudaDeviceProp deviceProp;
+	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
+	float* result_compare = new float[m_nnd.nb_output_layer];
+	cudaMemcpy(m_self_x[0] + 1, col, sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
+	propagate();
+	cudaMemcpy(result_compare, m_self_x[m_nndc.self_l] + 1, sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
+	for (int l = 0; l < m_nnd.nb_output_layer; l++)
+	{
+		(*output).push_back(result_compare[l]);
+	}
+	delete[] result_compare;
+	return;
+}
+
+void NeuralNetwork::useInput(const std::vector<std::vector<float>> input,std::vector<std::vector<float>> * output)
+{
+	output->clear();
+	for (int i = 0; i < input.size(); i++)
+	{
+		if (input[i].size() != m_nnd.nb_input_layer)
+		{
+			fprintf(stderr, "input[%d] size : %d not equal to input layer size : %d", i, input[i].size(), m_nnd.nb_input_layer);
+			return;
+		}
+		output->push_back({});
+	}	
+	cudaError_t cudaStatus;
+	cudaStatus = cudaSetDevice(0);
+	if (cudaStatus != cudaSuccess)
+	{
+		fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+		return;
+	}
+
+	cudaDeviceProp deviceProp;
+	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
+	float* result_compare = new float[m_nnd.nb_output_layer];
+	for (int i = 0; i < input.size(); i++)
+	{
+		cudaMemcpy(m_self_x[0] + 1, input[i].data(), sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
+		propagate();
+		cudaMemcpy(result_compare, m_self_x[m_nndc.self_l] + 1, sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
+		for (int l = 0; l < m_nnd.nb_output_layer; l++)
+		{
+			(*output)[i].push_back(result_compare[l]);
+		}
+	}
+	delete[] result_compare;
+	return;
+}
+
 void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output,float min_percent_error_train)
 {
 	if (input.size() != output.size())
@@ -187,7 +251,7 @@ void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, c
 			cudaMemcpy(result_compare, m_self_x[m_nndc.self_l] + 1, sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
 			for (int l = 0; l < m_nnd.nb_output_layer; l++)
 			{
-				errormoy += abs(output[i][l] - result_compare[l]) * (1.0f/ m_nnd.nb_output_layer);
+				errormoy += abs(std::clamp(output[i][l] - result_compare[l],-1.0f,1.0f)) * 0.5f * (1.0f/ m_nnd.nb_output_layer);
 			}
 		}
 		errormoy = errormoy / input.size();
@@ -222,15 +286,11 @@ void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vecto
 
 	cudaDeviceProp deviceProp;
 	cudaStatus = cudaGetDeviceProperties(&deviceProp, 0);
+	int batch_image = 10;
 	float errormoy = 0.0f;
 	int gardeFou = 100001;
 	float* result_compare = new float[m_nnd.nb_output_layer];
 	std::vector<std::vector<float>> output;
-	int totalDivideError = 0;
-	for (std::pair<const std::string, std::vector<float*>> d : data)
-	{
-		totalDivideError+=d.second.size();
-	}
 	for (int i = 0; i < data.size(); i++)
 	{
 		std::vector<float> co;		
@@ -242,39 +302,35 @@ void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vecto
 		output.push_back(co);
 		std::cout << std::endl;
 	}
+	int skipClass = 0;
 	for (int j = 0; j < gardeFou; j++)
 	{		
 		errormoy = 0.0f;
-		int countData = 0;
-		for (std::pair<const std::string, std::vector<float*>> d : data)
-		{			
-			int currentd = 0;
-			for (float* ptr : d.second) 
-			{				
-				cudaMemcpy(m_self_x[0] + 1, ptr, sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
+		for (int l = 0; l < batch_image; l++)
+		{
+			int countData = 0;
+			for (std::pair<const std::string, std::vector<float*>> d : data)
+			{
+				cudaMemcpy(m_self_x[0] + 1, d.second[skipClass % d.second.size()], sizeof(float) * m_nnd.nb_input_layer, cudaMemcpyHostToDevice);
 				propagate();
 				backPropagate(output[countData]);
 				cudaMemcpy(result_compare, m_self_x[m_nndc.self_l] + 1, sizeof(float) * m_nnd.nb_output_layer, cudaMemcpyDeviceToHost);
 				for (int l = 0; l < m_nnd.nb_output_layer; l++)
 				{
-					errormoy += abs(output[countData][l] - result_compare[l]) * (1.0f/ m_nnd.nb_output_layer);					
+					errormoy += abs(std::clamp(output[countData][l] - result_compare[l],-2.0f,2.0f)) * 0.5f * (1.0f / m_nnd.nb_output_layer);
 				}
-				if (currentd % 10 == 0)
-				{
-					std::cout << "Image : " << currentd << " Errormoy : " << errormoy << std::endl;
-				}
-				currentd++;
+				countData++;
 			}
-			countData++;
-		}	
-		errormoy = errormoy / totalDivideError;
+			skipClass++;
+		}
+		errormoy = errormoy / (data.size()* batch_image);
 		std::cout << "Error: " << errormoy * 100.0f << "%" << std::endl;
 		if (errormoy * 100.0f < min_percent_error_train)
 		{
 			j = gardeFou;
 			delete[] result_compare;
 			return;
-		}
+		}		
 	}
 	delete[] result_compare;
 }
@@ -282,15 +338,117 @@ void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vecto
 void NeuralNetwork::loadModel(const std::string& modelPath)
 {
 	std::cout << "LoadModel : " << modelPath << std::endl;
-}
+	std::ifstream file(modelPath, std::ios::binary | std::ios::in);
+	if (!file.is_open()) 
+	{
+		std::cerr << "Error: Couldn't open the file for reading." << std::endl;
+		return;
+	}
+	float*** host_m_self_w = new float** [(m_nnd.nb_col_hiden_layer + 2)];
+	for (int l = 1; l < m_nnd.nb_col_hiden_layer + 2; l++)
+	{
+		host_m_self_w[l] = new float* [(m_array_size_d[l - 1] + 1)];
+		for (int i = 0; i < (m_array_size_d[l - 1] + 1); i++)
+		{
+			host_m_self_w[l][i] = new float[(m_array_size_d[l] + 1)];			
+		}
+	}
 
-void NeuralNetwork::setInputData(const std::vector<double>& inputData)
-{
+	int cv = 0;
+	file.read(reinterpret_cast<char*>(&cv), sizeof(int));
+	if (m_nnd.nb_input_layer != cv)
+	{
+		fprintf(stderr, "current input_layer : %d not equal to file input_layer %d", m_nnd.nb_input_layer, cv);
+		return;
+	}
+	file.read(reinterpret_cast<char*>(&cv), sizeof(int));
+	if (m_nnd.nb_col_hiden_layer != cv)
+	{
+		fprintf(stderr, "current col_hiden_layer : %d not equal to file col_hiden_layer %d", m_nnd.nb_col_hiden_layer, cv);
+		return;
+	}
+	file.read(reinterpret_cast<char*>(&cv), sizeof(int));
+	if (m_nnd.nb_hiden_layer != cv)
+	{
+		fprintf(stderr, "current hiden_layer : %d not equal to file hiden_layer %d", m_nnd.nb_hiden_layer, cv);
+		return;
+	}
+	file.read(reinterpret_cast<char*>(&cv), sizeof(int));
+	if (m_nnd.nb_output_layer != cv)
+	{
+		fprintf(stderr, "current output_layer : %d not equal to file output_layer %d", m_nnd.nb_output_layer, cv);
+		return;
+	}
+	int d_size = (m_nnd.nb_col_hiden_layer + 2);
+	file.read(reinterpret_cast<char*>(&d_size), sizeof(int));
+	file.read(reinterpret_cast<char*>(m_array_size_d), sizeof(int) * d_size);
 
+	for (int l = 1; l < m_nnd.nb_col_hiden_layer + 2; l++)
+	{
+		for (int i = 0; i < (m_array_size_d[l - 1] + 1); i++)
+		{
+			file.read(reinterpret_cast<char*>(host_m_self_w[l][i]), sizeof(int) * (m_array_size_d[l] + 1));
+		}
+	}
+
+	for (int l = 1; l < m_nnd.nb_col_hiden_layer + 2; l++)
+	{
+		for (int i = 0; i < (m_array_size_d[l - 1] + 1); i++)
+		{
+			cudaMemcpy(m_self_w[l][i], host_m_self_w[l][i], sizeof(float) * (m_array_size_d[l] + 1), cudaMemcpyHostToDevice);
+			delete[] host_m_self_w[l][i];
+		}
+		delete[] host_m_self_w[l];
+	}
+	delete[] host_m_self_w;
+	file.close();
 }
 
 void NeuralNetwork::saveModel(const std::string& modelPath)
 {
+	std::ofstream file(modelPath, std::ios::binary | std::ios::out);
+	if (!file.is_open())
+	{
+		std::cerr << "Error: Couldn't open the file for writing." << std::endl;
+		return;
+	}
+	float*** host_m_self_w = new float**[(m_nnd.nb_col_hiden_layer + 2)];
+	for (int l = 1; l < m_nnd.nb_col_hiden_layer + 2; l++)
+	{
+		host_m_self_w[l] = new float* [(m_array_size_d[l - 1] + 1)];
+		for (int i = 0; i < (m_array_size_d[l - 1] + 1); i++)
+		{
+			host_m_self_w[l][i] = new float[(m_array_size_d[l] + 1)];
+			cudaMemcpy(host_m_self_w[l][i], m_self_w[l][i], sizeof(float) * (m_array_size_d[l] + 1), cudaMemcpyDeviceToHost);
+		}
+	}
+
+	file.write(reinterpret_cast<const char*>(&m_nnd.nb_input_layer), sizeof(int));	
+	file.write(reinterpret_cast<const char*>(&m_nnd.nb_col_hiden_layer), sizeof(int));	
+	file.write(reinterpret_cast<const char*>(&m_nnd.nb_hiden_layer), sizeof(int));
+	file.write(reinterpret_cast<const char*>(&m_nnd.nb_output_layer), sizeof(int));
+	int d_size = (m_nnd.nb_col_hiden_layer + 2);
+	file.write(reinterpret_cast<const char*>(&d_size), sizeof(int));
+	file.write(reinterpret_cast<const char*>(m_array_size_d), sizeof(int)* d_size);
+
+	for (int l = 1; l < m_nnd.nb_col_hiden_layer + 2; l++)
+	{		
+		for (int i = 0; i < (m_array_size_d[l - 1] + 1); i++)
+		{	
+			file.write(reinterpret_cast<const char*>(host_m_self_w[l][i]), sizeof(int) * (m_array_size_d[l] + 1));
+		}
+	}
+
+	for (int l = 1; l < m_nnd.nb_col_hiden_layer + 2; l++)
+	{		
+		for (int i = 0; i < (m_array_size_d[l - 1] + 1); i++)
+		{
+			delete[] host_m_self_w[l][i];
+		}
+		delete[] host_m_self_w[l];
+	}
+	delete[] host_m_self_w;
+	file.close();
 }
 
 void NeuralNetwork::propagate()
@@ -319,6 +477,11 @@ void NeuralNetwork::propagate()
 		PropagateNeuralNetwork(dimGrid,dimBlock, m_nld_Buffer, m_nndc_Buffer, m_self_d, m_self_w, m_self_x);
 		cudaDeviceSynchronize();
 	}
+}
+
+NeuralNetworkData* NeuralNetwork::getNeuralNetworkData()
+{
+	return &m_nnd;
 }
 
 void NeuralNetwork::backPropagate(std::vector<float> prediction_Data)

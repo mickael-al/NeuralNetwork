@@ -14,11 +14,13 @@ public:
 	~NeuralNetwork();
 	void trainingDataSet(const std::map<const std::string, std::vector<float*>>& data, int input_size,float min_percent_error_train);
 	void trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, float min_percent_error_train);
+	void useInput(const std::vector<std::vector<float>> input, std::vector<std::vector<float>>* output);
+	void useInputImage(float* col, std::vector<float>* output);
 	void loadModel(const std::string& modelPath);
-	void setInputData(const std::vector<double>& inputData);
 	void saveModel(const std::string& modelPath);
 	void propagate();
 	void backPropagate(std::vector<float> prediction_Data);
+	NeuralNetworkData* getNeuralNetworkData();
 private:
 	//gpu
 	float *** m_self_w;

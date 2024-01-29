@@ -18,6 +18,18 @@ typedef void (*TrainingNeuralNetwork)(NeuralNetwork*, const std::string&, float)
 void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, float min_percent_error_train);
 typedef void (*TrainingNeuralNetworkInput)(NeuralNetwork*, const std::vector<std::vector<float>>, const std::vector<std::vector<float>>, float);
 
+void useNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input,std::vector<std::vector<float>> * output);
+typedef void (*UseNeuralNetworkInput)(NeuralNetwork*, const std::vector<std::vector<float>>, std::vector<std::vector<float>>* output);
+
+void useNeuralNetworkImage(NeuralNetwork* nn, const std::string& image_path, std::vector<float>* output);
+typedef void (*UseNeuralNetworkImage)(NeuralNetwork* nn, const std::string& dataSetPath, std::vector<float>* output);
+
+void loadNeuralNetworkModel(NeuralNetwork* nn, const std::string& modelPath);
+typedef void(*LoadNeuralNetworkModel)(NeuralNetwork*, const std::string&);
+
+void saveNeuralNetworkModel(NeuralNetwork* nn, const std::string& modelPath);
+typedef void(*SaveNeuralNetworkModel)(NeuralNetwork*, const std::string&);
+
 void releaseNeuralNetwork(NeuralNetwork* network);
 typedef void(*ReleaseNeuralNetwork)(NeuralNetwork*);
 

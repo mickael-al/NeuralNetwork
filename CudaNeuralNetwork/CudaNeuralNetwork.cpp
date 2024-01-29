@@ -80,6 +80,68 @@ void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector
     nn->trainingInput(input, output, min_percent_error_train);
 }
 
+void loadNeuralNetworkModel(NeuralNetwork* nn, const std::string& modelPath) 
+{
+    nn->loadModel(modelPath);
+}
+
+void saveNeuralNetworkModel(NeuralNetwork* nn, const std::string& modelPath)
+{
+    nn->saveModel(modelPath);
+}
+
+void useNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, std::vector<std::vector<float>> * ouput)
+{
+    nn->useInput(input, ouput);
+}
+
+void useNeuralNetworkImage(NeuralNetwork* nn, const std::string& image_path, std::vector<float>* output)
+{
+    NeuralNetworkData* nnd = nn->getNeuralNetworkData();
+    ImageData* id = new ImageData(image_path.c_str());
+    int csize = (int)sqrt(nnd->nb_input_layer);
+    if (id->getHeight() != csize || id->getWidth() != csize)
+    {        
+        id->resize(csize);
+        id->write();
+    }    
+    stbimg stb = ImageData::loadData(id->getPath());
+    delete id;
+    float* col = new float[csize * csize * 3];
+
+    int offset = 0;
+    int offset2 = 0;
+    if (stb.ch == 3)
+    {
+        for (int i = 0; i < stb.height; i++)
+        {
+            for (int j = 0; j < stb.width; j++)
+            {
+                offset = (i * stb.width + j) * stb.ch;
+                col[offset] = (((float)stb.data[offset] / 255.0f) * 2.0f) - 1.0f;
+                col[offset + 1] = (((float)stb.data[offset + 1] / 255.0f) * 2.0f) - 1.0f;
+                col[offset + 2] = (((float)stb.data[offset + 2] / 255.0f) * 2.0f) - 1.0f;
+            }
+        }
+    }
+    else if (stb.ch == 4)
+    {
+        for (int i = 0; i < stb.height; i++)
+        {
+            for (int j = 0; j < stb.width; j++)
+            {
+                offset = (i * stb.width + j) * 4;
+                offset2 = (i * stb.width + j) * 3;
+                col[offset2] = (((float)stb.data[offset] / 255.0f) * 2.0f) - 1.0f;
+                col[offset2 + 1] = (((float)stb.data[offset + 1] / 255.0f) * 2.0f) - 1.0f;
+                col[offset2 + 2] = (((float)stb.data[offset + 2] / 255.0f) * 2.0f) - 1.0f;
+            }
+        }
+    }
+
+    nn->useInputImage(col, output);
+}
+
 void releaseNeuralNetwork(NeuralNetwork* network)
 {
     delete network;
@@ -173,6 +235,7 @@ void generateDataSet(const std::string& path, const std::string& dataSetSavepath
     std::map<const std::string, std::vector<float*>> data;
     for (const auto& pair : m_map_dataset) 
     {        
+        std::cout << pair.first << std::endl;
         std::vector<float*> d;
         for (const auto& value : pair.second) 
         {
