@@ -5,4 +5,8 @@ EXPORTS
     releaseNeuralNetwork
     trainingNeuralNetwork
     trainingNeuralNetworkInput
+    useNeuralNetworkInput
     generateDataSet
+    loadNeuralNetworkModel
+    saveNeuralNetworkModel
+    useNeuralNetworkImage

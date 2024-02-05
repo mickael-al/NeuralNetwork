@@ -39,9 +39,9 @@ int main()
     if (true)
     {
         NeuralNetworkData nnd{};
-        nnd.nb_input_layer = image_size * image_size;
+        nnd.nb_input_layer = image_size * image_size * 3;
         nnd.nb_col_hiden_layer = 2;
-        nnd.nb_hiden_layer = 256;
+        nnd.nb_hiden_layer = 512;
         nnd.nb_output_layer = 3;
         nnd.alpha = 0.001f;
         nnd.is_classification = false;
@@ -50,18 +50,35 @@ int main()
         //saveNeuralNetworkModel(nn, imageModelPath);
         loadNeuralNetworkModel(nn, imageModelPath);
         std::vector<float> output;
-        useNeuralNetworkImage(nn, "6.jpg", &output);
+        useNeuralNetworkImage(nn, "./13.jpg", &output);
         for (int j = 0; j < output.size(); j++)
         {
             std::cout << "Result : " << output[j] << std::endl;
         }
         std::cout << std::endl;
-        useNeuralNetworkImage(nn, "./1.jpg", &output);
+        useNeuralNetworkImage(nn, "./14.jpg", &output);
         for (int j = 0; j < output.size(); j++)
         {
             std::cout << "Result : " << output[j] << std::endl;
         }
-        useNeuralNetworkImage(nn, "./3.jpg", &output);
+        useNeuralNetworkImage(nn, "./15.jpg", &output);
+        std::cout << std::endl;
+        for (int j = 0; j < output.size(); j++)
+        {
+            std::cout << "Result : " << output[j] << std::endl;
+        }
+        useNeuralNetworkImage(nn, "./139.jpg", &output);
+        for (int j = 0; j < output.size(); j++)
+        {
+            std::cout << "Result : " << output[j] << std::endl;
+        }
+        std::cout << std::endl;
+        useNeuralNetworkImage(nn, "./142.jpg", &output);
+        for (int j = 0; j < output.size(); j++)
+        {
+            std::cout << "Result : " << output[j] << std::endl;
+        }
+        useNeuralNetworkImage(nn, "./144.jpg", &output);
         std::cout << std::endl;
         for (int j = 0; j < output.size(); j++)
         {
@@ -73,10 +90,10 @@ int main()
     {
         NeuralNetworkData nnd{};
         nnd.nb_input_layer = 2;
-        nnd.nb_col_hiden_layer = 4;
-        nnd.nb_hiden_layer = 1024;
+        nnd.nb_col_hiden_layer = 2;
+        nnd.nb_hiden_layer = 512;
         nnd.nb_output_layer = 1;
-        nnd.alpha = 0.001f;
+        nnd.alpha = 0.005f;
         nnd.is_classification = false;
         NeuralNetwork* nn = createNeuralNetwork(nnd);
         std::vector<std::vector<float>> xor_data;

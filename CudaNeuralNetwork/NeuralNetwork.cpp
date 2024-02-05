@@ -271,9 +271,9 @@ void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vecto
 		fprintf(stderr, "data size : %d not equal to output size : %d", data.size(), m_nnd.nb_output_layer);
 		return;
 	}
-	if (input_size* input_size != m_nnd.nb_input_layer)
+	if (input_size* input_size *3 != m_nnd.nb_input_layer)
 	{
-		fprintf(stderr, "input_size image : %d not equal to input layer size : %d", input_size * input_size, m_nnd.nb_input_layer);
+		fprintf(stderr, "input_size image : %d not equal to input layer size : %d", input_size * input_size * 3, m_nnd.nb_input_layer);
 		return;
 	}
 	cudaError_t cudaStatus;
