@@ -6,8 +6,22 @@
 #include "NeuralSwapData.hpp"
 #include <string>
 #include <vector>
+#include "Vec.hpp"//et boom 
 
 class NeuralNetwork;
+class LinearModel;
+
+LinearModel* createLinearModel();
+typedef LinearModel* (*CreateLinearModel)();
+
+void releaseLinearModel(LinearModel* lm);
+typedef void(*ReleaseLinearModel)(LinearModel*);
+
+void trainingLinearModel(LinearModel* lm, float learning_rate, Vec2* training_data, int size, std::vector<double> point);
+typedef void(*TrainingLinearModel)(float learning_rate, Vec2* training_data, int size, std::vector<double> point);
+
+double predictLinearModel(LinearModel* lm, Vec2* point);
+typedef double(*PredictLinearModel)(Vec2* point);
 
 NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd);
 typedef NeuralNetwork* (*CreateNeuralNetwork)(NeuralNetworkData nnd);

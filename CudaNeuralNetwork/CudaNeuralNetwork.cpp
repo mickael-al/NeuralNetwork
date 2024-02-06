@@ -7,6 +7,7 @@
 #include <map>
 #include <filesystem>
 #include <fstream>
+#include "LinearModel.hpp"
 
 namespace fs = std::filesystem;
 
@@ -66,6 +67,26 @@ std::map<const std::string, std::vector<float*>> charger(const std::string& nom_
         std::cerr << "Impossible d'ouvrir le fichier pour chargement." << std::endl;
     }
     return donnees;
+}
+
+LinearModel* createLinearModel()
+{
+    return new LinearModel();
+}
+
+void releaseLinearModel(LinearModel* lm)
+{
+    delete lm;
+}
+
+void trainingLinearModel(LinearModel* lm,float learning_rate, Vec2* training_data, int size, std::vector<double> point)
+{
+    lm->training(learning_rate,training_data,size,point);
+}
+
+double predictLinearModel(LinearModel* lm,Vec2* point)
+{
+    lm->predict(point);
 }
 
 void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, float min_percent_error_train)

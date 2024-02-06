@@ -91,9 +91,11 @@
     <ClInclude Include="export.hpp" />
     <ClInclude Include="ImageData.hpp" />
     <ClInclude Include="kernel.h" />
+    <ClInclude Include="LinearModel.hpp" />
     <ClInclude Include="NeuralNetwork.hpp" />
     <ClInclude Include="NeuralNetworkData.hpp" />
     <ClInclude Include="NeuralSwapData.hpp" />
+    <ClInclude Include="Vec.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -103,6 +105,7 @@
     <ClCompile Include="Color.cpp" />
     <ClCompile Include="CudaNeuralNetwork.cpp" />
     <ClCompile Include="ImageData.cpp" />
+    <ClCompile Include="LinearModel.cpp" />
     <ClCompile Include="NeuralNetwork.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
