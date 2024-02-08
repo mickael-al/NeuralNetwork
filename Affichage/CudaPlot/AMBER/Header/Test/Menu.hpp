@@ -4,6 +4,7 @@
 #include "Scene.hpp"
 #include "GameEngine.hpp"
 #include "implot.h"
+#include "../../../CudaNeuralNetwork/CudaNeuralNetwork.hpp"
 
 class Menu : public Scene, public ImguiBlock, public Behaviour
 {
@@ -19,6 +20,16 @@ public:
 	void onGUI();
 private:
 	ptrClass m_pc;
+	void * m_Dll;
+	CreateNeuralNetwork m_createNeuralNetwork;
+	ReleaseNeuralNetwork m_releaseNeuralNetwork;
+	TrainingNeuralNetworkInput m_trainingNeuralNetworkInput;
+	TrainingNeuralNetwork m_trainingNeuralNetwork;
+	GenerateDataSet m_generateDataSet;
+	UseNeuralNetworkInput m_useNeuralNetworkInput;
+	LoadNeuralNetworkModel m_loadNeuralNetworkModel;
+	SaveNeuralNetworkModel m_saveNeuralNetworkModel;
+	UseNeuralNetworkImage m_useNeuralNetworkImage;
 };
 
 #endif //!__MENU__

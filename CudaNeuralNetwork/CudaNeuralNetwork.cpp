@@ -18,7 +18,7 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
         fprintf(stderr, "createNeuralNetwork failed! invalid input NeuralNetworkData\n");
         return nullptr;
     }
-
+    std::cout << "Create Neural network" << std::endl;
     return new NeuralNetwork(nnd);
 }
 
@@ -86,7 +86,7 @@ void trainingLinearModel(LinearModel* lm,float learning_rate, Vec2* training_dat
 
 double predictLinearModel(LinearModel* lm,Vec2* point)
 {
-    lm->predict(point);
+    return lm->predict(point);
 }
 
 void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, float min_percent_error_train)
@@ -96,9 +96,9 @@ void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, fl
     nn->trainingDataSet(data, size, min_percent_error_train);
 }
 
-void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, float min_percent_error_train)
+void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error, float min_percent_error_train)
 {
-    nn->trainingInput(input, output, min_percent_error_train);
+    nn->trainingInput(input, output,error, min_percent_error_train);
 }
 
 void loadNeuralNetworkModel(NeuralNetwork* nn, const std::string& modelPath) 

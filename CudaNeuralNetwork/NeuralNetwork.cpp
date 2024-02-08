@@ -207,8 +207,9 @@ void NeuralNetwork::useInput(const std::vector<std::vector<float>> input,std::ve
 	return;
 }
 
-void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output,float min_percent_error_train)
+void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error,float min_percent_error_train)
 {
+	(*error).clear();
 	if (input.size() != output.size())
 	{
 		fprintf(stderr, "input size : %d not equal to output size : %d", input.size(), output.size());
@@ -256,6 +257,7 @@ void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, c
 		}
 		errormoy = errormoy / input.size();
 		std::cout << "Error: " << errormoy * 100.0f << "%" << std::endl;
+		(*error).push_back(errormoy);
 		if (errormoy*100.0f < min_percent_error_train)
 		{
 			j = gardeFou;

@@ -29,8 +29,8 @@ typedef NeuralNetwork* (*CreateNeuralNetwork)(NeuralNetworkData nnd);
 void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, float min_percent_error_train);
 typedef void (*TrainingNeuralNetwork)(NeuralNetwork*, const std::string&, float);
 
-void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, float min_percent_error_train);
-typedef void (*TrainingNeuralNetworkInput)(NeuralNetwork*, const std::vector<std::vector<float>>, const std::vector<std::vector<float>>, float);
+void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>*error, float min_percent_error_train);
+typedef void (*TrainingNeuralNetworkInput)(NeuralNetwork*, const std::vector<std::vector<float>>, const std::vector<std::vector<float>>, std::vector<float>* error, float);
 
 void useNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input,std::vector<std::vector<float>> * output);
 typedef void (*UseNeuralNetworkInput)(NeuralNetwork*, const std::vector<std::vector<float>>, std::vector<std::vector<float>>* output);

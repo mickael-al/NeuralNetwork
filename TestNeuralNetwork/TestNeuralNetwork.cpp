@@ -36,7 +36,7 @@ int main()
     const std::string imageTest = "./cat.png";
     //generateDataSet("../DataSet", dataSetPath, image_size);
     
-    if (true)
+    if (false)
     {
         NeuralNetworkData nnd{};
         nnd.nb_input_layer = image_size * image_size * 3;
@@ -91,9 +91,9 @@ int main()
         NeuralNetworkData nnd{};
         nnd.nb_input_layer = 2;
         nnd.nb_col_hiden_layer = 2;
-        nnd.nb_hiden_layer = 512;
+        nnd.nb_hiden_layer = 2;
         nnd.nb_output_layer = 1;
-        nnd.alpha = 0.005f;
+        nnd.alpha = 0.1f;
         nnd.is_classification = false;
         NeuralNetwork* nn = createNeuralNetwork(nnd);
         std::vector<std::vector<float>> xor_data;
@@ -106,7 +106,8 @@ int main()
         xor_result_data.push_back({ 1 });
         xor_result_data.push_back({ 1 });
         xor_result_data.push_back({ -1 });
-        trainingNeuralNetworkInput(nn, xor_data, xor_result_data, 0.01f);
+        std::vector<float> error;
+        trainingNeuralNetworkInput(nn, xor_data, xor_result_data, &error, 0.01f);
         //saveNeuralNetworkModel(nn, xorModelPath);
         //loadNeuralNetworkModel(nn, xorModelPath);
         useNeuralNetworkInput(nn, xor_data, &xor_result_data);
