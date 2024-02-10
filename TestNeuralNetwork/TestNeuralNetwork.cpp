@@ -5,11 +5,11 @@
 int main()
 {
     HMODULE hDll = LoadLibrary(L".\\CudaNeuralNetwork.dll");
-    if (hDll == NULL) 
+    if (hDll == NULL)
     {
         return 1;
     }
-    
+
     CreateNeuralNetwork createNeuralNetwork = (CreateNeuralNetwork)GetProcAddress(hDll, "createNeuralNetwork");
     ReleaseNeuralNetwork releaseNeuralNetwork = (ReleaseNeuralNetwork)GetProcAddress(hDll, "releaseNeuralNetwork");
     TrainingNeuralNetworkInput trainingNeuralNetworkInput = (TrainingNeuralNetworkInput)GetProcAddress(hDll, "trainingNeuralNetworkInput");
@@ -19,6 +19,10 @@ int main()
     LoadNeuralNetworkModel loadNeuralNetworkModel = (LoadNeuralNetworkModel)GetProcAddress(hDll, "loadNeuralNetworkModel");
     SaveNeuralNetworkModel saveNeuralNetworkModel = (SaveNeuralNetworkModel)GetProcAddress(hDll, "saveNeuralNetworkModel");
     UseNeuralNetworkImage useNeuralNetworkImage = (UseNeuralNetworkImage)GetProcAddress(hDll, "useNeuralNetworkImage");
+    CreateLinearModel m_linearModel = (CreateLinearModel)GetProcAddress(hDll, "createLinearModel");
+    ReleaseLinearModel  m_releaseLinearModel = (ReleaseLinearModel)GetProcAddress(hDll, "releaseLinearModel");
+    TrainingLinearModel m_trainingLinearModel = (TrainingLinearModel)GetProcAddress(hDll, "trainingLinearModel");
+    PredictLinearModel m_predictLinearModel = (PredictLinearModel)GetProcAddress(hDll, "predictLinearModel");
     if (createNeuralNetwork == NULL)
     {
         std::cerr << "createNeuralNetwork not found" << std::endl;
@@ -35,7 +39,23 @@ int main()
     const std::string imageModelPath = "./image_model.model";
     const std::string imageTest = "./cat.png";
     //generateDataSet("../DataSet", dataSetPath, image_size);
-    
+
+
+    std::vector<Vec2> m_input;
+    std::vector<double> m_result;
+    m_input.push_back({ 1, 1 });
+    m_input.push_back({ 2, 3 });
+    m_input.push_back({ 3, 3 });
+    m_result.push_back(1);
+    m_result.push_back(-1);
+    m_result.push_back(-1);
+    std::vector<float> m_error;
+    LinearModel * lm = m_linearModel();
+    m_trainingLinearModel(lm, 0.01f, (Vec2*)(&m_input[0]), m_input.size(), m_result, &m_error);
+
+    m_releaseLinearModel(lm);
+
+    return 0;
     if (false)
     {
         NeuralNetworkData nnd{};
@@ -107,7 +127,8 @@ int main()
         xor_result_data.push_back({ 1 });
         xor_result_data.push_back({ -1 });
         std::vector<float> error;
-        trainingNeuralNetworkInput(nn, xor_data, xor_result_data, &error, 0.01f);
+        float min_percent = 0.01f;
+        trainingNeuralNetworkInput(nn, xor_data, xor_result_data, &error, &min_percent);
         //saveNeuralNetworkModel(nn, xorModelPath);
         //loadNeuralNetworkModel(nn, xorModelPath);
         useNeuralNetworkInput(nn, xor_data, &xor_result_data);

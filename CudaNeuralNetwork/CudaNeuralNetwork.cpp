@@ -79,9 +79,9 @@ void releaseLinearModel(LinearModel* lm)
     delete lm;
 }
 
-void trainingLinearModel(LinearModel* lm,float learning_rate, Vec2* training_data, int size, std::vector<double> point)
+void trainingLinearModel(LinearModel* lm,float learning_rate, Vec2* training_data, int size, std::vector<double> point, std::vector<float>* error)
 {
-    lm->training(learning_rate,training_data,size,point);
+    lm->training(learning_rate,training_data,size,point,error);
 }
 
 double predictLinearModel(LinearModel* lm,Vec2* point)
@@ -96,9 +96,14 @@ void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, fl
     nn->trainingDataSet(data, size, min_percent_error_train);
 }
 
-void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error, float min_percent_error_train)
+void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error, float * min_percent_error_train)
 {
     nn->trainingInput(input, output,error, min_percent_error_train);
+}
+
+void updateNNAlpha(NeuralNetwork* nn, float alpha)
+{
+    nn->updateAlpha(alpha);
 }
 
 void loadNeuralNetworkModel(NeuralNetwork* nn, const std::string& modelPath) 

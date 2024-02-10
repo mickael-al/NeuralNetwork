@@ -207,7 +207,7 @@ void NeuralNetwork::useInput(const std::vector<std::vector<float>> input,std::ve
 	return;
 }
 
-void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error,float min_percent_error_train)
+void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error,float * min_percent_error_train)
 {
 	(*error).clear();
 	if (input.size() != output.size())
@@ -257,8 +257,8 @@ void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, c
 		}
 		errormoy = errormoy / input.size();
 		std::cout << "Error: " << errormoy * 100.0f << "%" << std::endl;
-		(*error).push_back(errormoy);
-		if (errormoy*100.0f < min_percent_error_train)
+		(*error).push_back(errormoy * 100.0f);
+		if (errormoy*100.0f < *min_percent_error_train)
 		{
 			j = gardeFou;
 		}
@@ -451,6 +451,12 @@ void NeuralNetwork::saveModel(const std::string& modelPath)
 	}
 	delete[] host_m_self_w;
 	file.close();
+}
+
+void NeuralNetwork::updateAlpha(float alpha)
+{
+	m_nndc.alpha = alpha;
+	cudaMemcpy(m_nndc_Buffer, &m_nndc, sizeof(NeuralNetworkDataCompact), cudaMemcpyHostToDevice);
 }
 
 void NeuralNetwork::propagate()

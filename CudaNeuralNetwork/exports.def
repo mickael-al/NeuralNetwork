@@ -9,4 +9,9 @@ EXPORTS
     generateDataSet
     loadNeuralNetworkModel
     saveNeuralNetworkModel
-    useNeuralNetworkImage
+    updateNNAlpha
+    useNeuralNetworkImage    
+    createLinearModel
+    releaseLinearModel
+    trainingLinearModel
+    predictLinearModel
