@@ -35,7 +35,7 @@ public:
 	Color operator-(const Color& rhs) const;
 	Color operator*(const Color& rhs) const;
 	Color operator/(const Color& rhs) const;
-	Color operator/(const float& rhs) const;
+	Color operator/(const double& rhs) const;
 
 	bool operator==(const Color& rhs) const;
 	bool operator!=(const Color& rhs) const;

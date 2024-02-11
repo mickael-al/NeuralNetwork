@@ -107,14 +107,14 @@ void Menu::preRender(VulkanMisc* vM)
 
 }
 
-void Menu::TrainNN(NeuralNetwork* m_nn, TrainingNeuralNetworkInput * trainingNeuralNetworkInput, std::vector<std::vector<float>> xor_data, std::vector<std::vector<float>> xor_result_data, std::vector<float> * error,float * min_percent_error_train, bool * hasFinished)
+void Menu::TrainNN(NeuralNetwork* m_nn, TrainingNeuralNetworkInput * trainingNeuralNetworkInput, std::vector<std::vector<double>> xor_data, std::vector<std::vector<double>> xor_result_data, std::vector<float> * error,double * min_percent_error_train, bool * hasFinished)
 {    
     *hasFinished = true;
     (*trainingNeuralNetworkInput)(m_nn, xor_data, xor_result_data, error, min_percent_error_train);
     *hasFinished = false;
 }
 
-void Menu::TrainDataSetNN(NeuralNetwork* m_nn, TrainingNeuralNetwork* trainingNeuralNetwork, std::string path, std::vector<float>* error, float* min_percent_error_train, bool* hasFinished)
+void Menu::TrainDataSetNN(NeuralNetwork* m_nn, TrainingNeuralNetwork* trainingNeuralNetwork, std::string path, std::vector<float>* error, double* min_percent_error_train, bool* hasFinished)
 {
     *hasFinished = true;
     (*trainingNeuralNetwork)(m_nn, path, error, min_percent_error_train);
@@ -164,14 +164,14 @@ void Menu::trainingLinearData(std::vector<glm::vec2>* data, std::vector<double>*
     {
         for (int i = 0; i < 50; i++)
         {
-            float x1 = (std::rand() % 1000 / 1000.0) * 0.9 + 1;
-            float y1 = (std::rand() % 1000 / 1000.0) * 0.9 + 1;
+            double x1 = (std::rand() % 1000 / 1000.0) * 0.9 + 1;
+            double y1 = (std::rand() % 1000 / 1000.0) * 0.9 + 1;
             (*data).push_back({ x1,y1 });
-            (*result_data).push_back({ 1.0f });
-            float x2 = (std::rand() % 1000 / 1000.0) * 0.9 + 2;
-            float y2 = (std::rand() % 1000 / 1000.0) * 0.9 + 2;
+            (*result_data).push_back({ 1.0 });
+            double x2 = (std::rand() % 1000 / 1000.0) * 0.9 + 2;
+            double y2 = (std::rand() % 1000 / 1000.0) * 0.9 + 2;
             (*data).push_back({ x2,y2 });
-            (*result_data).push_back({ -1.0f });
+            (*result_data).push_back({ -1.0 });
         }
     }
     else if (selectedTestCase == 2)
@@ -189,17 +189,17 @@ void Menu::trainingLinearData(std::vector<glm::vec2>* data, std::vector<double>*
     {
         for (int i = 0; i < 500; ++i)
         {
-            float x = (std::rand() % 2000 / 1000.0) - 1.0;
-            float y = (std::rand() % 2000 / 1000.0) - 1.0;
+            double x = (std::rand() % 2000 / 1000.0) - 1.0;
+            double y = (std::rand() % 2000 / 1000.0) - 1.0;
             (*data).push_back({ x, y });
 
-            float label = (std::abs(x) <= 0.3 || std::abs(y) <= 0.3) ? 1 : -1;
+            double label = (std::abs(x) <= 0.3 || std::abs(y) <= 0.3) ? 1 : -1;
             (*result_data).push_back({ label });
         }
     }    
 }
 
-void Menu::trainingData(std::vector<std::vector<float>>* data, std::vector<std::vector<float>>* result_data)
+void Menu::trainingData(std::vector<std::vector<double>>* data, std::vector<std::vector<double>>* result_data)
 {
     if (selectedTestCase == 0)
     {
@@ -214,14 +214,14 @@ void Menu::trainingData(std::vector<std::vector<float>>* data, std::vector<std::
     {
         for (int i = 0; i < 50; i++)
         {
-            float x1 = (std::rand() % 1000 / 1000.0) * 0.9 + 1;
-            float y1 = (std::rand() % 1000 / 1000.0) * 0.9 + 1;
+            double x1 = (std::rand() % 1000 / 1000.0) * 0.9 + 1;
+            double y1 = (std::rand() % 1000 / 1000.0) * 0.9 + 1;
             (*data).push_back({ x1,y1 });
-            (*result_data).push_back({ 1.0f });
-            float x2 = (std::rand() % 1000 / 1000.0) * 0.9 + 2;
-            float y2 = (std::rand() % 1000 / 1000.0) * 0.9 + 2;
+            (*result_data).push_back({ 1.0 });
+            double x2 = (std::rand() % 1000 / 1000.0) * 0.9 + 2;
+            double y2 = (std::rand() % 1000 / 1000.0) * 0.9 + 2;
             (*data).push_back({ x2,y2 });
-            (*result_data).push_back({ -1.0f });
+            (*result_data).push_back({ -1.0 });
         }
     }
     else if (selectedTestCase == 2)
@@ -239,11 +239,11 @@ void Menu::trainingData(std::vector<std::vector<float>>* data, std::vector<std::
     {
         for (int i = 0; i < 500; ++i)
         {
-            float x = (std::rand() % 2000 / 1000.0) - 1.0;
-            float y = (std::rand() % 2000 / 1000.0) - 1.0;
+            double x = (std::rand() % 2000 / 1000.0) - 1.0;
+            double y = (std::rand() % 2000 / 1000.0) - 1.0;
             (*data).push_back({ x, y });
 
-            float label = (std::abs(x) <= 0.3 || std::abs(y) <= 0.3) ? 1 : -1;
+            double label = (std::abs(x) <= 0.3 || std::abs(y) <= 0.3) ? 1 : -1;
             (*result_data).push_back({ label });
         }
     }
@@ -251,14 +251,14 @@ void Menu::trainingData(std::vector<std::vector<float>>* data, std::vector<std::
     {
         for (int i = 0; i < 500; ++i)
         {
-            float x = (std::rand() % 2000 / 1000.0) - 1.0;
-            float y = (std::rand() % 2000 / 1000.0) - 1.0;
+            double x = (std::rand() % 2000 / 1000.0) - 1.0;
+            double y = (std::rand() % 2000 / 1000.0) - 1.0;
             (*data).push_back({ x, y });
         }
 
         for (const auto& p : (*data))
         {
-            std::vector<float> label;
+            std::vector<double> label;
             if (-p[0] - p[1] - 0.5 > 0 && p[1] < 0 && p[0] - p[1] - 0.5 < 0)
             {
                 label = { 1, 0, 0 };
@@ -278,8 +278,8 @@ void Menu::trainingData(std::vector<std::vector<float>>* data, std::vector<std::
             (*result_data).push_back(label);
         }
 
-        std::vector<std::vector<float>> filteredX;
-        std::vector<std::vector<float>> filteredY;
+        std::vector<std::vector<double>> filteredX;
+        std::vector<std::vector<double>> filteredY;
 
         for (size_t i = 0; i < (*result_data).size(); ++i)
         {
@@ -296,16 +296,16 @@ void Menu::trainingData(std::vector<std::vector<float>>* data, std::vector<std::
     {
         for (int i = 0; i < 1000; ++i)
         {
-            float x = (std::rand() % 2000 / 1000.0) - 1.0;
-            float y = (std::rand() % 2000 / 1000.0) - 1.0;
+            double x = (std::rand() % 2000 / 1000.0) - 1.0;
+            double y = (std::rand() % 2000 / 1000.0) - 1.0;
             (*data).push_back({ x, y });
         }
 
         for (const auto& p : (*data))
         {
-            float x_mod = std::fmod(std::abs(p[0]), 0.5);
-            float y_mod = std::fmod(std::abs(p[1]), 0.5);
-            std::vector<float> label;
+            double x_mod = std::fmod(std::abs(p[0]), 0.5);
+            double y_mod = std::fmod(std::abs(p[1]), 0.5);
+            std::vector<double> label;
 
             if (x_mod <= 0.25 && y_mod > 0.25)
             {
@@ -328,21 +328,21 @@ void Menu::trainingData(std::vector<std::vector<float>>* data, std::vector<std::
 
 void Menu::render(VulkanMisc* vM)
 {
-    ImGui::SetNextWindowSize(ImVec2((float)m_pc.settingManager->getWindowWidth(), (float)m_pc.settingManager->getWindowHeight()));
+    ImGui::SetNextWindowSize(ImVec2((double)m_pc.settingManager->getWindowWidth(), (double)m_pc.settingManager->getWindowHeight()));
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::Begin("Dll Test");
-    ImGui::Text("NN Setting");
+    ImGui::Text("NN Setting");    
     ImGui::DragInt("Input layer Size", &(m_nnd.nb_input_layer));
     ImGui::DragInt("Hiden layer Size", &m_nnd.nb_hiden_layer);
     ImGui::DragInt("Hiden Col layer Size", &m_nnd.nb_col_hiden_layer);
     ImGui::DragInt("Output layer Size", &m_nnd.nb_output_layer);
-    if (ImGui::DragFloat("alpha", &m_nnd.alpha) && m_nn != nullptr)
+    if (ImGui::DragScalar("alpha", ImGuiDataType_Double, &m_nnd.alpha) && m_nn != nullptr)
     {
         m_updateNNAlpha(m_nn, m_nnd.alpha);
     }
     ImGui::Checkbox("is classification", &m_nnd.is_classification);
     ImGui::Text("Training Setting");
-    ImGui::DragFloat("minimum percent error train", &m_min_percent_error_train);
+    ImGui::DragScalar("minimum percent error train", ImGuiDataType_Double, &m_min_percent_error_train);
     ImGui::InputText("Neural Network path", &m_filepath[0], 256);
     ImGui::InputText("Neural DataSet path", &m_datapath[0], 256);
     ImGui::InputText("Neural Image path", &m_testpath[0], 256);
@@ -489,8 +489,8 @@ void Menu::render(VulkanMisc* vM)
             ImGui::SameLine();
             if (ImGui::Button("Training Input"))
             {
-                std::vector<std::vector<float>> data;
-                std::vector<std::vector<float>> result_data;
+                std::vector<std::vector<double>> data;
+                std::vector<std::vector<double>> result_data;
                 trainingData(&data, &result_data);
                 m_error.clear();
                 m_currentThread = new std::thread(&Menu::TrainNN, m_nn, &m_trainingNeuralNetworkInput, data, result_data, &m_error, &m_min_percent_error_train,&m_trainingState);
@@ -499,8 +499,8 @@ void Menu::render(VulkanMisc* vM)
             ImGui::SameLine();
             if (ImGui::Button("Result"))
             {
-                std::vector<std::vector<float>> data;
-                std::vector<std::vector<float>> result_data;
+                std::vector<std::vector<double>> data;
+                std::vector<std::vector<double>> result_data;
                 trainingData(&data, &result_data);        
                 m_class.clear();
                 m_class.resize(result_data[0].size() + 1);
@@ -537,8 +537,8 @@ void Menu::render(VulkanMisc* vM)
             ImGui::SameLine();
             if (ImGui::Button("Use"))
             {
-                std::vector<std::vector<float>> data;
-                std::vector<std::vector<float>> result_data;
+                std::vector<std::vector<double>> data;
+                std::vector<std::vector<double>> result_data;
                 trainingData(&data, &result_data);
                 m_useNeuralNetworkInput(m_nn, data, &result_data);
                 m_class.clear();
@@ -596,12 +596,12 @@ void Menu::render(VulkanMisc* vM)
                     k++;
                 }     
                 k = 0;
-                float last = 0.0f;
+                double last = 0.0;
                 for (auto a : data)
                 {                       
                     for (int i = 0; i < a.second.size(); i++)
                     {                        
-                        m_class[k][0].push_back((k* (last /30.0f)) + (i / 40));
+                        m_class[k][0].push_back((k* (last /30.0)) + (i / 40));
                         m_class[k][1].push_back(i%40);
                     }
                     last = a.second.size();
@@ -632,12 +632,12 @@ void Menu::render(VulkanMisc* vM)
                 }
                 k = 0;
                 int nk = 0;
-                float last = 0.0f;
+                double last = 0.0;
                 for (auto a : data)
                 {
                     for (int i = 0; i < a.second.size(); i++)
                     {
-                        std::vector<float> output;
+                        std::vector<double> output;
                         m_useNeuralNetworkImage(m_nn, a.second[i], &output);
                         nk = 0;
                         for (int j = 1; j < data.size(); j++)
@@ -647,7 +647,7 @@ void Menu::render(VulkanMisc* vM)
                                 nk = j;
                             }
                         }
-                        m_class[nk][0].push_back((k * (last / 30.0f)) + (i / 40));
+                        m_class[nk][0].push_back((k * (last / 30.0)) + (i / 40));
                         m_class[nk][1].push_back(i % 40);
                     }
                     last = a.second.size();
@@ -668,8 +668,8 @@ void Menu::render(VulkanMisc* vM)
         {
             if (ImGui::Button("Stop Training"))
             {
-                float vi = m_min_percent_error_train;
-                m_min_percent_error_train = 100.0f;
+                double vi = m_min_percent_error_train;
+                m_min_percent_error_train = 100.0;
                 while (m_trainingState) { Debug::Log("Wait"); }
                 m_min_percent_error_train = vi;
                 m_currentThread = nullptr;

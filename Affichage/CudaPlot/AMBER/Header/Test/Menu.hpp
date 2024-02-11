@@ -21,10 +21,10 @@ public:
 	void update();
 	void stop();
 	void onGUI();
-	void trainingData(std::vector<std::vector<float>> * data,std::vector<std::vector<float>> * result_data);
+	void trainingData(std::vector<std::vector<double>> * data,std::vector<std::vector<double>> * result_data);
 	void trainingLinearData(std::vector<glm::vec2>* data, std::vector<double>* result_data);
-	static void TrainNN(NeuralNetwork* m_nn, TrainingNeuralNetworkInput* trainingNeuralNetworkInput, std::vector<std::vector<float>> xor_data, std::vector<std::vector<float>> xor_result_data, std::vector<float>* error, float * min_percent_error_train,bool * hasFinished);
-	static void TrainDataSetNN(NeuralNetwork* m_nn, TrainingNeuralNetwork* trainingNeuralNetwork, std::string path, std::vector<float>* error, float* min_percent_error_train, bool* hasFinished);
+	static void TrainNN(NeuralNetwork* m_nn, TrainingNeuralNetworkInput* trainingNeuralNetworkInput, std::vector<std::vector<double>> xor_data, std::vector<std::vector<double>> xor_result_data, std::vector<float>* error, double * min_percent_error_train,bool * hasFinished);
+	static void TrainDataSetNN(NeuralNetwork* m_nn, TrainingNeuralNetwork* trainingNeuralNetwork, std::string path, std::vector<float>* error, double* min_percent_error_train, bool* hasFinished);
 private:
 	ptrClass m_pc;
 	void * m_Dll;
@@ -35,7 +35,7 @@ private:
 	std::string m_testpath = "./imageTest";
 	bool m_trainingState = false;
 	int selectedTestCase = 0;
-	float m_min_percent_error_train = 0.05f;
+	double m_min_percent_error_train = 0.05f;
 	std::vector<std::vector<std::vector<float>>> m_class;
 	std::vector<std::string*> m_name_class;
 	NeuralNetworkData m_nnd;

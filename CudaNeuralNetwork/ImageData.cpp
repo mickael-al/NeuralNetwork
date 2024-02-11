@@ -71,7 +71,7 @@ ImageData::ImageData(const char * file_name)
 void ImageData::resize(int size)
 {
     int max = (m_width > m_height) ? m_width : m_height;
-    float reveretRatio = (float)max/ size;
+    double reveretRatio = (double)max/ size;
 
     Color** ncolor = new Color * [size];
     for (int i = 0; i < size; i++)
@@ -79,9 +79,9 @@ void ImageData::resize(int size)
         ncolor[i] = new Color[size];
     }
 
-    for (float i = 0; (int)i < m_height; i+= reveretRatio)
+    for (double i = 0; (int)i < m_height; i+= reveretRatio)
     {
-        for (float j = 0; (int)j < m_width; j+= reveretRatio)
+        for (double j = 0; (int)j < m_width; j+= reveretRatio)
         {
             ncolor[(int)(i / reveretRatio)][(int)(j / reveretRatio)] = m_color[(int)i][(int)j];
         }

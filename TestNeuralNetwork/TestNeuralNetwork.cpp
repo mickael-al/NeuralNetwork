@@ -40,9 +40,10 @@ int main()
     const std::string imageModelPath = "./image_model.model";
     const std::string imageTest = "./cat.png";
     generateDataSet("../DataSet", dataSetPath, image_size);
+    return 0;
 
 
-    std::vector<Vec2> m_input;
+    /*std::vector<Vec2> m_input;
     std::vector<double> m_result;
     m_input.push_back({ 1, 1 });
     m_input.push_back({ 2, 3 });
@@ -50,13 +51,13 @@ int main()
     m_result.push_back(1);
     m_result.push_back(-1);
     m_result.push_back(-1);
-    std::vector<float> m_error;
+    std::vector<double> m_error;
     LinearModel * lm = m_linearModel();
     m_trainingLinearModel(lm, 0.01f, (Vec2*)(&m_input[0]), m_input.size(), m_result, &m_error);
 
     m_releaseLinearModel(lm);
 
-    return 0;
+    return 0;*/
     if (false)
     {
         NeuralNetworkData nnd{};
@@ -67,10 +68,10 @@ int main()
         nnd.alpha = 0.001f;
         nnd.is_classification = false;
         NeuralNetwork* nn = createNeuralNetwork(nnd);
-        //trainingNeuralNetwork(nn, dataSetPath, 3.0f);
+        //trainingNeuralNetwork(nn, dataSetPath, 3.0);
         //saveNeuralNetworkModel(nn, imageModelPath);
         loadNeuralNetworkModel(nn, imageModelPath);
-        std::vector<float> output;
+        std::vector<double> output;
         useNeuralNetworkImage(nn, "./13.jpg", &output);
         for (int j = 0; j < output.size(); j++)
         {
@@ -117,18 +118,18 @@ int main()
         nnd.alpha = 0.1f;
         nnd.is_classification = false;
         NeuralNetwork* nn = createNeuralNetwork(nnd);
-        std::vector<std::vector<float>> xor_data;
+        std::vector<std::vector<double>> xor_data;
         xor_data.push_back({ 0,0 });
         xor_data.push_back({ 1,0 });
         xor_data.push_back({ 0,1 });
         xor_data.push_back({ 1,1 });
-        std::vector<std::vector<float>> xor_result_data;
+        std::vector<std::vector<double>> xor_result_data;
         xor_result_data.push_back({ -1 });
         xor_result_data.push_back({ 1 });
         xor_result_data.push_back({ 1 });
         xor_result_data.push_back({ -1 });
         std::vector<float> error;
-        float min_percent = 0.01f;
+        double min_percent = 0.01f;
         trainingNeuralNetworkInput(nn, xor_data, xor_result_data, &error, &min_percent);
         //saveNeuralNetworkModel(nn, xorModelPath);
         //loadNeuralNetworkModel(nn, xorModelPath);

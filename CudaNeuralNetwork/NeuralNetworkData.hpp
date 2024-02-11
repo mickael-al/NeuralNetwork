@@ -11,14 +11,14 @@ struct NeuralNetworkData
 	int activationSize;
 	int weightSize;
 	bool is_classification;
-	float alpha;
+	double alpha;
 };
 
 struct NeuralNetworkDataCompact
 {
 	int self_l;
 	bool is_classification;
-	float alpha;
+	double alpha;
 };
 
 #endif //!__NEURAL_NETWORK_DATA__

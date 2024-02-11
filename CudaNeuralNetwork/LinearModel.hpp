@@ -10,7 +10,7 @@ class LinearModel
 public:
     LinearModel();
     ~LinearModel();
-    void training(float learning_rate, Vec2* training_data, int size, std::vector<double> point, std::vector<float>* error);
+    void training(double learning_rate, Vec2* training_data, int size, std::vector<double> point, std::vector<float>* error);
     double predict(Vec2* point);
 
 private:

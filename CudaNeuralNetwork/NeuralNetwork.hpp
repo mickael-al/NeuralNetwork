@@ -13,21 +13,21 @@ class NeuralNetwork
 public:
 	NeuralNetwork(NeuralNetworkData nnd);
 	~NeuralNetwork();
-	void trainingDataSet(const std::map<const std::string, std::vector<float*>>& data, int input_size, std::vector<float>* error,float * min_percent_error_train);
-	void trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error, float * min_percent_error_train);
-	void useInput(const std::vector<std::vector<float>> input, std::vector<std::vector<float>>* output);
-	void useInputImage(float* col, std::vector<float>* output);
+	void trainingDataSet(const std::map<const std::string, std::vector<double*>>& data, int input_size, std::vector<float>* error,double * min_percent_error_train);
+	void trainingInput(const std::vector<std::vector<double>> input, const std::vector<std::vector<double>> output, std::vector<float>* error, double * min_percent_error_train);
+	void useInput(const std::vector<std::vector<double>> input, std::vector<std::vector<double>>* output);
+	void useInputImage(double* col, std::vector<double>* output);
 	void loadModel(const std::string& modelPath);
 	void saveModel(const std::string& modelPath);
 	void propagate();
-	void updateAlpha(float alpha);
-	void backPropagate(std::vector<float> prediction_Data);
+	void updateAlpha(double alpha);
+	void backPropagate(std::vector<double> prediction_Data);
 	NeuralNetworkData* getNeuralNetworkData();
 private:
 	//gpu
-	float *** m_self_w;
-	float ** m_self_x;
-	float ** m_self_delta;
+	double *** m_self_w;
+	double ** m_self_x;
+	double ** m_self_delta;
 	int* m_self_d;
 	NeuralSwapData* m_nld_Buffer;
 	NeuralNetworkDataCompact* m_nndc_Buffer;
@@ -37,8 +37,8 @@ private:
 	NeuralSwapData m_nld;
 	NeuralNetworkDataCompact m_nndc;
 	int* m_array_size_d;
-	float* m_outDelta;
-	float* m_activation;
+	double* m_outDelta;
+	double* m_activation;
 
 };
 

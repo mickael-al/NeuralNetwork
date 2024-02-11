@@ -23,9 +23,9 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
     return new NeuralNetwork(nnd);
 }
 
-std::map<const std::string, std::vector<float*>> charger(const std::string& nom_fichier, int* size)
+std::map<const std::string, std::vector<double*>> charger(const std::string& nom_fichier, int* size)
 {
-    std::map<const std::string, std::vector<float*>> donnees;
+    std::map<const std::string, std::vector<double*>> donnees;
     std::ifstream fichier(nom_fichier, std::ios::binary);
     if (fichier.is_open())
     {
@@ -49,11 +49,11 @@ std::map<const std::string, std::vector<float*>> charger(const std::string& nom_
             size_t taille_vecteur;
             fichier.read(reinterpret_cast<char*>(&taille_vecteur), sizeof(size_t));
 
-            // Lecture des données float du vecteur
-            std::vector<float*> vecteur;
+            // Lecture des données double du vecteur
+            std::vector<double*> vecteur;
             for (size_t j = 0; j < taille_vecteur; ++j) {
-                float* valeur = new float[image_size * image_size * 3];
-                fichier.read(reinterpret_cast<char*>(valeur), sizeof(float) * image_size * image_size * 3);
+                double* valeur = new double[image_size * image_size * 3];
+                fichier.read(reinterpret_cast<char*>(valeur), sizeof(double) * image_size * image_size * 3);
                 vecteur.push_back(valeur);
             }
 
@@ -80,7 +80,7 @@ void releaseLinearModel(LinearModel* lm)
     delete lm;
 }
 
-void trainingLinearModel(LinearModel* lm,float learning_rate, Vec2* training_data, int size, std::vector<double> point, std::vector<float>* error)
+void trainingLinearModel(LinearModel* lm,double learning_rate, Vec2* training_data, int size, std::vector<double> point, std::vector<float>* error)
 {
     lm->training(learning_rate,training_data,size,point,error);
 }
@@ -90,19 +90,19 @@ double predictLinearModel(LinearModel* lm,Vec2* point)
     return lm->predict(point);
 }
 
-void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, std::vector<float>* error, float * min_percent_error_train)
+void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, std::vector<float>* error, double * min_percent_error_train)
 {
     int size;
-    std::map<const std::string, std::vector<float*>> data = charger(dataSetPath,&size);
+    std::map<const std::string, std::vector<double*>> data = charger(dataSetPath,&size);
     nn->trainingDataSet(data, size, error, min_percent_error_train);    
 }
 
-void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error, float * min_percent_error_train)
+void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<double>> input, const std::vector<std::vector<double>> output, std::vector<float>* error, double * min_percent_error_train)
 {
     nn->trainingInput(input, output,error, min_percent_error_train);
 }
 
-void updateNNAlpha(NeuralNetwork* nn, float alpha)
+void updateNNAlpha(NeuralNetwork* nn, double alpha)
 {
     nn->updateAlpha(alpha);
 }
@@ -117,12 +117,12 @@ void saveNeuralNetworkModel(NeuralNetwork* nn, const std::string& modelPath)
     nn->saveModel(modelPath);
 }
 
-void useNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, std::vector<std::vector<float>> * ouput)
+void useNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<double>> input, std::vector<std::vector<double>> * ouput)
 {
     nn->useInput(input, ouput);
 }
 
-void useNeuralNetworkImage(NeuralNetwork* nn, const std::string& image_path, std::vector<float>* output)
+void useNeuralNetworkImage(NeuralNetwork* nn, const std::string& image_path, std::vector<double>* output)
 {
     NeuralNetworkData* nnd = nn->getNeuralNetworkData();
     ImageData* id = new ImageData(image_path.c_str());
@@ -134,7 +134,7 @@ void useNeuralNetworkImage(NeuralNetwork* nn, const std::string& image_path, std
     }    
     stbimg stb = ImageData::loadData(id->getPath());
     delete id;
-    float* col = new float[csize * csize * 3];
+    double* col = new double[csize * csize * 3];
 
     int offset = 0;
     int offset2 = 0;
@@ -145,9 +145,9 @@ void useNeuralNetworkImage(NeuralNetwork* nn, const std::string& image_path, std
             for (int j = 0; j < stb.width; j++)
             {
                 offset = (i * stb.width + j) * stb.ch;
-                col[offset] = (((float)stb.data[offset] / 255.0f) * 2.0f) - 1.0f;
-                col[offset + 1] = (((float)stb.data[offset + 1] / 255.0f) * 2.0f) - 1.0f;
-                col[offset + 2] = (((float)stb.data[offset + 2] / 255.0f) * 2.0f) - 1.0f;
+                col[offset] = (((double)stb.data[offset] / 255.0) * 2.0) - 1.0;
+                col[offset + 1] = (((double)stb.data[offset + 1] / 255.0) * 2.0) - 1.0;
+                col[offset + 2] = (((double)stb.data[offset + 2] / 255.0) * 2.0) - 1.0;
             }
         }
     }
@@ -159,9 +159,9 @@ void useNeuralNetworkImage(NeuralNetwork* nn, const std::string& image_path, std
             {
                 offset = (i * stb.width + j) * 4;
                 offset2 = (i * stb.width + j) * 3;
-                col[offset2] = (((float)stb.data[offset] / 255.0f) * 2.0f) - 1.0f;
-                col[offset2 + 1] = (((float)stb.data[offset + 1] / 255.0f) * 2.0f) - 1.0f;
-                col[offset2 + 2] = (((float)stb.data[offset + 2] / 255.0f) * 2.0f) - 1.0f;
+                col[offset2] = (((double)stb.data[offset] / 255.0) * 2.0) - 1.0;
+                col[offset2 + 1] = (((double)stb.data[offset + 1] / 255.0) * 2.0) - 1.0;
+                col[offset2 + 2] = (((double)stb.data[offset + 2] / 255.0) * 2.0) - 1.0;
             }
         }
     }
@@ -216,7 +216,7 @@ void getArborescence(const fs::path& chemin, const fs::path& basePath, std::map<
     }
 }
 
-void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, const std::string& nom_fichier, size_t image_size)
+void sauvegarder(const std::map<const std::string, std::vector<double*>>& data, const std::string& nom_fichier, size_t image_size)
 {
     std::ofstream fichier(nom_fichier, std::ios::binary);
     if (fichier.is_open()) 
@@ -239,10 +239,10 @@ void sauvegarder(const std::map<const std::string, std::vector<float*>>& data, c
             size_t taille_vecteur = paire.second.size();
             fichier.write(reinterpret_cast<const char*>(&taille_vecteur), sizeof(size_t));
 
-            // Écriture des données float du vecteur
+            // Écriture des données double du vecteur
             for (size_t i = 0; i < taille_vecteur; ++i) 
             {
-                fichier.write(reinterpret_cast<const char*>(paire.second[i]), sizeof(float)* image_size * image_size *3);
+                fichier.write(reinterpret_cast<const char*>(paire.second[i]), sizeof(double)* image_size * image_size *3);
             }
         }
         fichier.close();
@@ -259,14 +259,14 @@ void generateDataSet(const std::string& path, const std::string& dataSetSavepath
     std::cout << "load Image" << std::endl;
     getArborescence(path, path, &m_map_dataset, image_data_size);
     std::cout << "Compute ThanH Image" << std::endl;
-    std::map<const std::string, std::vector<float*>> data;
+    std::map<const std::string, std::vector<double*>> data;
     for (const auto& pair : m_map_dataset) 
     {        
         std::cout << pair.first << std::endl;
-        std::vector<float*> d;
+        std::vector<double*> d;
         for (const auto& value : pair.second) 
         {
-            float* col = new float[image_data_size * image_data_size * 3];
+            double* col = new double[image_data_size * image_data_size * 3];
 
             int offset = 0;
             int offset2 = 0;
@@ -277,9 +277,9 @@ void generateDataSet(const std::string& path, const std::string& dataSetSavepath
                     for (int j = 0; j < value.width; j++)
                     {
                         offset = (i * value.width + j) * value.ch;
-                        col[offset] = (((float)value.data[offset] / 255.0f) * 2.0f) - 1.0f;
-                        col[offset + 1] = (((float)value.data[offset + 1] / 255.0f) * 2.0f) - 1.0f;
-                        col[offset + 2] = (((float)value.data[offset + 2] / 255.0f) * 2.0f) - 1.0f;
+                        col[offset] = (((double)value.data[offset] / 255.0) * 2.0) - 1.0;
+                        col[offset + 1] = (((double)value.data[offset + 1] / 255.0) * 2.0) - 1.0;
+                        col[offset + 2] = (((double)value.data[offset + 2] / 255.0) * 2.0) - 1.0;
                     }
                 }
             }
@@ -291,9 +291,9 @@ void generateDataSet(const std::string& path, const std::string& dataSetSavepath
                     {
                         offset = (i * value.width + j) * 4;
                         offset2 = (i * value.width + j) * 3;
-                        col[offset2] = (((float)value.data[offset] / 255.0f) * 2.0f) - 1.0f;
-                        col[offset2 + 1] = (((float)value.data[offset + 1] / 255.0f) * 2.0f) - 1.0f;
-                        col[offset2 + 2] = (((float)value.data[offset + 2] / 255.0f) * 2.0f) - 1.0f;
+                        col[offset2] = (((double)value.data[offset] / 255.0) * 2.0) - 1.0;
+                        col[offset2 + 1] = (((double)value.data[offset + 1] / 255.0) * 2.0) - 1.0;
+                        col[offset2 + 2] = (((double)value.data[offset + 2] / 255.0) * 2.0) - 1.0;
                     }
                 }
             }

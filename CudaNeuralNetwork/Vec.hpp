@@ -10,11 +10,11 @@ struct Vec2
 
 struct Vec3
 {
-	double x;
-	double y;
-	double z;
+	float x;
+	float y;
+	float z;
 
-	Vec3(double xi, double yi, double zi)
+	Vec3(float xi, float yi, float zi)
 	{
 		x = xi;
 		y = yi;

@@ -171,7 +171,7 @@ Color Color::operator/(const Color& rhs) const
 	m_array[3] / rhs.m_array[3]);
 }
 
-Color Color::operator/(const float& rhs) const
+Color Color::operator/(const double& rhs) const
 {
 	return Color(m_array[0] / rhs,
 		m_array[1] / rhs,
