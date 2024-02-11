@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #include <iostream>
 #include <Windows.h>
 #include "CudaNeuralNetwork.hpp"
@@ -38,7 +39,7 @@ int main()
     const std::string xorModelPath = "./xor_model.model";
     const std::string imageModelPath = "./image_model.model";
     const std::string imageTest = "./cat.png";
-    //generateDataSet("../DataSet", dataSetPath, image_size);
+    generateDataSet("../DataSet", dataSetPath, image_size);
 
 
     std::vector<Vec2> m_input;

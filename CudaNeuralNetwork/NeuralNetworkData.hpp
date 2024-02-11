@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #ifndef __NEURAL_NETWORK_DATA__
 #define __NEURAL_NETWORK_DATA__
 

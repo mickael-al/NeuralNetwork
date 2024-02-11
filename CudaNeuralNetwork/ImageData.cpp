@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #include "ImageData.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb-master/stb_image.h"

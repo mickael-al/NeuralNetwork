@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #include "CNNHelper.hpp"
 
 void CNNHelper::KernelDispath(int size, cudaDeviceProp * deviceProp, dim3* numBlocks, dim3* blockSize)

@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #include "LinearModel.hpp"
 #include <ctime>
 #include <iostream>

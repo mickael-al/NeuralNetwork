@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #ifndef LINEAR_MODEL_HPP
 #define LINEAR_MODEL_HPP
 

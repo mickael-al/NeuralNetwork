@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #ifndef __VEC_DLL__
 #define __VEC_DLL__
 

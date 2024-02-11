@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #ifndef __IMAGE_DATA__
 #define __IMAGE_DATA__
 

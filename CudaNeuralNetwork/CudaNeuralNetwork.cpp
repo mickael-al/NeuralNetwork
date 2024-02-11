@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #include "CudaNeuralNetwork.hpp"
 #include "CNNHelper.hpp"
 #include "NeuralNetwork.hpp"
@@ -89,11 +90,11 @@ double predictLinearModel(LinearModel* lm,Vec2* point)
     return lm->predict(point);
 }
 
-void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, float min_percent_error_train)
+void trainingNeuralNetwork(NeuralNetwork* nn, const std::string& dataSetPath, std::vector<float>* error, float * min_percent_error_train)
 {
     int size;
     std::map<const std::string, std::vector<float*>> data = charger(dataSetPath,&size);
-    nn->trainingDataSet(data, size, min_percent_error_train);
+    nn->trainingDataSet(data, size, error, min_percent_error_train);    
 }
 
 void trainingNeuralNetworkInput(NeuralNetwork* nn, const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error, float * min_percent_error_train)

@@ -1,4 +1,4 @@
-﻿
+﻿//Peer Programming: Guo, Albarello
 #include "kernel.h"
 #include <iostream>
 

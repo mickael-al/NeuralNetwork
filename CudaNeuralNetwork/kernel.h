@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #ifndef KERNEL_H
 #define KERNEL_H
 

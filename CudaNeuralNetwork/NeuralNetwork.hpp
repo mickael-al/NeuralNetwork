@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #ifndef __NEURAL_NETWORK__
 #define __NEURAL_NETWORK__
 
@@ -12,7 +13,7 @@ class NeuralNetwork
 public:
 	NeuralNetwork(NeuralNetworkData nnd);
 	~NeuralNetwork();
-	void trainingDataSet(const std::map<const std::string, std::vector<float*>>& data, int input_size,float min_percent_error_train);
+	void trainingDataSet(const std::map<const std::string, std::vector<float*>>& data, int input_size, std::vector<float>* error,float * min_percent_error_train);
 	void trainingInput(const std::vector<std::vector<float>> input, const std::vector<std::vector<float>> output, std::vector<float>* error, float * min_percent_error_train);
 	void useInput(const std::vector<std::vector<float>> input, std::vector<std::vector<float>>* output);
 	void useInputImage(float* col, std::vector<float>* output);

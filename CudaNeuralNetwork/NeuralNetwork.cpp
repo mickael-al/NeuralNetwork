@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #include "NeuralNetwork.hpp"
 #include "device_launch_parameters.h"
 #include "cuda_runtime.h"
@@ -266,8 +267,9 @@ void NeuralNetwork::trainingInput(const std::vector<std::vector<float>> input, c
 	delete[] result_compare;
 }
 
-void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vector<float*>> & data,int input_size, float min_percent_error_train)
+void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vector<float*>> & data,int input_size, std::vector<float>* error, float * min_percent_error_train)
 {
+	(*error).clear();
 	if (data.size() != m_nnd.nb_output_layer)
 	{
 		fprintf(stderr, "data size : %d not equal to output size : %d", data.size(), m_nnd.nb_output_layer);
@@ -327,7 +329,8 @@ void NeuralNetwork::trainingDataSet(const std::map<const std::string, std::vecto
 		}
 		errormoy = errormoy / (data.size()* batch_image);
 		std::cout << "Error: " << errormoy * 100.0f << "%" << std::endl;
-		if (errormoy * 100.0f < min_percent_error_train)
+		(*error).push_back(errormoy * 100.0f);
+		if (errormoy * 100.0f < *min_percent_error_train)
 		{
 			j = gardeFou;
 			delete[] result_compare;

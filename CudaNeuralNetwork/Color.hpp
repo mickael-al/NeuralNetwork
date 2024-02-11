@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #ifndef __COLOR__
 #define __COLOR__
 

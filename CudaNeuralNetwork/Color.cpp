@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #include "Color.hpp"
 
 const Color& Color::ClearBlack()

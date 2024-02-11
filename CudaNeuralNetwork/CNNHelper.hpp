@@ -1,3 +1,4 @@
+//Peer Programming: Guo, Albarello
 #ifndef __CNN_HELPER__
 #define __CNN_HELPER__
 

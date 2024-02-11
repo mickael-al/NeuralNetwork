@@ -1,3 +1,8 @@
+//Peer Programming: Guo, Albarello
+
+#include <filesystem>
+#include <fstream>
+namespace fs = std::filesystem;
 #include <Windows.h>
 #include "Menu.hpp"
 #include <iostream>
@@ -46,7 +51,9 @@ void Menu::load()
     m_nnd.alpha = 0.1f;
     m_nnd.is_classification = false;
     std::srand(static_cast<unsigned int>(std::time(0)));
-    m_filepath.resize(255);
+    m_filepath.resize(256);
+    m_datapath.resize(256);
+    m_testpath.resize(256);
 }
 
 void Menu::unload()
@@ -105,6 +112,39 @@ void Menu::TrainNN(NeuralNetwork* m_nn, TrainingNeuralNetworkInput * trainingNeu
     *hasFinished = true;
     (*trainingNeuralNetworkInput)(m_nn, xor_data, xor_result_data, error, min_percent_error_train);
     *hasFinished = false;
+}
+
+void Menu::TrainDataSetNN(NeuralNetwork* m_nn, TrainingNeuralNetwork* trainingNeuralNetwork, std::string path, std::vector<float>* error, float* min_percent_error_train, bool* hasFinished)
+{
+    *hasFinished = true;
+    (*trainingNeuralNetwork)(m_nn, path, error, min_percent_error_train);
+    *hasFinished = false;
+}
+
+void getArborescence(const fs::path& chemin, const fs::path& basePath, std::map<std::string, std::vector<std::string>> * data)
+{
+    if (fs::is_directory(chemin))
+    {
+        for (const auto& entry : fs::directory_iterator(chemin))
+        {
+            if (fs::is_regular_file(entry.path()))
+            {
+                std::string extension = entry.path().extension().string();
+                if (extension == ".jpg" || extension == ".png")
+                {
+                    std::string s = chemin.string();
+                    s = s.substr(basePath.string().length() + 1, s.length());
+                    size_t pos = s.find("\\");
+                    s = s.substr(0, pos);
+                    (*data)[s].push_back(entry.path().string().c_str());
+                }
+            }
+            if (fs::is_directory(entry.path()))
+            {
+                getArborescence(entry.path(), basePath, data);
+            }
+        }
+    }
 }
 
 const char* CasTest[] = { "LinearSimple","LinearMultiple","Xor","Cross","MultiLinear","MultiCross"};
@@ -303,7 +343,9 @@ void Menu::render(VulkanMisc* vM)
     ImGui::Checkbox("is classification", &m_nnd.is_classification);
     ImGui::Text("Training Setting");
     ImGui::DragFloat("minimum percent error train", &m_min_percent_error_train);
-    ImGui::InputText("Neural Network path", &m_filepath[0], 255);
+    ImGui::InputText("Neural Network path", &m_filepath[0], 256);
+    ImGui::InputText("Neural DataSet path", &m_datapath[0], 256);
+    ImGui::InputText("Neural Image path", &m_testpath[0], 256);
     if (ImGui::BeginCombo("Test Case", CasTest[selectedTestCase]))
     {
         for (int i = 0; i < IM_ARRAYSIZE(CasTest); i++)
@@ -411,6 +453,22 @@ void Menu::render(VulkanMisc* vM)
         {
             m_lm = m_linearModel();
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Setup Image"))
+        {
+            m_nnd.nb_input_layer = 64 * 64 * 3;
+            m_nnd.nb_hiden_layer = 512;
+            m_nnd.nb_col_hiden_layer = 2;
+            m_nnd.nb_output_layer = 3;
+            m_nnd.alpha = 0.001;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Setup Input"))
+        {
+            m_nnd.nb_input_layer = 2;
+            m_nnd.nb_output_layer = 1;
+            m_nnd.alpha = 0.01;
+        }
     }
     else
     {
@@ -422,6 +480,13 @@ void Menu::render(VulkanMisc* vM)
         ImGui::SameLine();
         if (!m_trainingState)
         {
+            if (ImGui::Button("Training DataSet"))
+            {
+                m_error.clear();
+                m_currentThread = new std::thread(&Menu::TrainDataSetNN, m_nn, &m_trainingNeuralNetwork, m_datapath, &m_error, &m_min_percent_error_train, &m_trainingState);
+                m_currentThread->detach();
+            }
+            ImGui::SameLine();
             if (ImGui::Button("Training Input"))
             {
                 std::vector<std::vector<float>> data;
@@ -509,6 +574,86 @@ void Menu::render(VulkanMisc* vM)
                 }
             }
             ImGui::SameLine();
+            if (ImGui::Button("Result Image"))
+            {
+                std::map<std::string, std::vector<std::string>> data;                
+                getArborescence("./ImageTest", "./ImageTest", &data);
+                m_class.clear();
+                m_class.resize(data.size());
+                for (int i = 0; i < m_name_class.size(); i++)
+                {
+                    delete m_name_class[i];
+                }
+                m_name_class.clear();
+                int k = 0;
+                for (auto a : data)
+                {
+                    for (int j = 0; j < 2; j++)
+                    {
+                        m_class[k].push_back({});
+                    }
+                    m_name_class.push_back(new std::string(a.first));
+                    k++;
+                }     
+                k = 0;
+                float last = 0.0f;
+                for (auto a : data)
+                {                       
+                    for (int i = 0; i < a.second.size(); i++)
+                    {                        
+                        m_class[k][0].push_back((k* (last /30.0f)) + (i / 40));
+                        m_class[k][1].push_back(i%40);
+                    }
+                    last = a.second.size();
+                    k++;
+                }
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Use Image"))
+            {                
+                std::map<std::string, std::vector<std::string>> data;
+                getArborescence("./ImageTest", "./ImageTest", &data);
+                m_class.clear();
+                m_class.resize(data.size());
+                for (int i = 0; i < m_name_class.size(); i++)
+                {
+                    delete m_name_class[i];
+                }
+                m_name_class.clear();
+                int k = 0;
+                for (auto a : data)
+                {
+                    for (int j = 0; j < 2; j++)
+                    {
+                        m_class[k].push_back({});
+                    }
+                    m_name_class.push_back(new std::string(a.first));
+                    k++;
+                }
+                k = 0;
+                int nk = 0;
+                float last = 0.0f;
+                for (auto a : data)
+                {
+                    for (int i = 0; i < a.second.size(); i++)
+                    {
+                        std::vector<float> output;
+                        m_useNeuralNetworkImage(m_nn, a.second[i], &output);
+                        nk = 0;
+                        for (int j = 1; j < data.size(); j++)
+                        {
+                            if (output[nk] < output[j])
+                            {
+                                nk = j;
+                            }
+                        }
+                        m_class[nk][0].push_back((k * (last / 30.0f)) + (i / 40));
+                        m_class[nk][1].push_back(i % 40);
+                    }
+                    last = a.second.size();
+                    k++;
+                }
+            }
             if (ImGui::Button("Save NN"))
             {
                 m_saveNeuralNetworkModel(m_nn, m_filepath);
