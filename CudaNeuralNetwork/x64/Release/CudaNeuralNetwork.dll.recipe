@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\Projet\Cpp\CudaNeuralNetwork\x64\Release\CudaNeuralNetwork.dll</FullPath>
+      <FullPath>C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\x64\Release\CudaNeuralNetwork.dll</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

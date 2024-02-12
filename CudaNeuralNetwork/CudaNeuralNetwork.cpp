@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include "LinearModel.hpp"
+#include "Rbf.hpp"
 
 namespace fs = std::filesystem;
 
@@ -21,6 +22,21 @@ NeuralNetwork* createNeuralNetwork(NeuralNetworkData nnd)
     }
     std::cout << "Create Neural network" << std::endl;
     return new NeuralNetwork(nnd);
+}
+
+Rbf* createRbf(size_t nb_poids, double gam, std::vector<std::vector<double>> x, std::vector<double> y)
+{
+    return new Rbf(nb_poids,gam,x,y);
+}
+
+void releaseRbf(Rbf* rbf)
+{
+    delete rbf;
+}
+
+double predictRbf(Rbf* rbf, double x1, double x2)
+{
+    return rbf->predict(x1, x2);
 }
 
 std::map<const std::string, std::vector<double*>> charger(const std::string& nom_fichier, int* size)

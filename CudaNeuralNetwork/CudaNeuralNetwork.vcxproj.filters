@@ -27,6 +27,9 @@
     <ClCompile Include="LinearModel.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Rbf.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="kernel.h">
@@ -60,6 +63,9 @@
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Vec.hpp">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Rbf.hpp">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>

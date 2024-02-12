@@ -1,16 +1,17 @@
 ﻿  CudaNeuralNetwork.cpp
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(36,27): warning C4267: '=' : conversion de 'size_t' en 'int', perte possible de données
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(404,1): warning C4533: l'initialisation de 'dimBlock' est ignorée par 'goto Error'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(378): message : voir la déclaration de 'dimBlock'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(404): message : voir la déclaration de 'Error'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(404,1): warning C4533: l'initialisation de 'dimGrid' est ignorée par 'goto Error'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(377): message : voir la déclaration de 'dimGrid'
-D:\Projet\Cpp\CudaNeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(404): message : voir la déclaration de 'Error'
-  LinearModel.cpp
-     Création de la bibliothèque D:\Projet\Cpp\CudaNeuralNetwork\x64\Release\CudaNeuralNetwork.lib et de l'objet D:\Projet\Cpp\CudaNeuralNetwork\x64\Release\CudaNeuralNetwork.exp
+C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(53,27): warning C4267: '=' : conversion de 'size_t' en 'int', perte possible de données
+C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(426,1): warning C4533: l'initialisation de 'dimBlock' est ignorée par 'goto Error'
+C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(400): message : voir la déclaration de 'dimBlock'
+C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(426): message : voir la déclaration de 'Error'
+C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(426,1): warning C4533: l'initialisation de 'dimGrid' est ignorée par 'goto Error'
+C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(399): message : voir la déclaration de 'dimGrid'
+C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\CudaNeuralNetwork\CudaNeuralNetwork.cpp(426): message : voir la déclaration de 'Error'
+  Rbf.cpp
+     Création de la bibliothèque C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\x64\Release\CudaNeuralNetwork.lib et de l'objet C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\x64\Release\CudaNeuralNetwork.exp
 LINK : warning LNK4098: conflit entre la bibliothèque par défaut 'LIBCMT' et les autres bibliothèques ; utilisez /NODEFAULTLIB:library
   Génération de code en cours
-  Previous IPDB not found, fall back to full compilation.
-  All 1218 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  3 of 3050 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    43 functions had inline decision re-evaluated but remain unchanged
   Fin de la génération du code
-  CudaNeuralNetwork.vcxproj -> D:\Projet\Cpp\CudaNeuralNetwork\x64\Release\CudaNeuralNetwork.dll
+  CudaNeuralNetwork.vcxproj -> C:\Users\micka\Documents\Projet\Cpp\NeuralNetwork\x64\Release\CudaNeuralNetwork.dll

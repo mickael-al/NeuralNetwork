@@ -39,9 +39,10 @@ private:
 	std::vector<std::vector<std::vector<float>>> m_class;
 	std::vector<std::string*> m_name_class;
 	NeuralNetworkData m_nnd;
+	double m_gamma = 10;
 	NeuralNetwork* m_nn = nullptr;
 	LinearModel* m_lm = nullptr;
-
+	Rbf* m_rbf = nullptr;
 	CreateNeuralNetwork m_createNeuralNetwork;
 	UpdateNNAlpha m_updateNNAlpha;
 	ReleaseNeuralNetwork m_releaseNeuralNetwork;
@@ -57,6 +58,10 @@ private:
 	ReleaseLinearModel m_releaseLinearModel;
 	TrainingLinearModel m_trainingLinearModel;
 	PredictLinearModel m_predictLinearModel;
+
+	CreateRbf m_createRbf;
+	ReleaseRbf m_releaseRbf;
+	PredictRbf m_predictRbf;	
 };
 
 #endif //!__MENU__

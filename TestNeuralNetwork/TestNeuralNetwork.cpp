@@ -35,11 +35,11 @@ int main()
         return 1;
     }
     const int image_size = 64;
-    const std::string dataSetPath = "../DataSet/data_64.dataset";
+    const std::string dataSetPath = "../DataSet/data_64_col.dataset";
     const std::string xorModelPath = "./xor_model.model";
     const std::string imageModelPath = "./image_model.model";
     const std::string imageTest = "./cat.png";
-    generateDataSet("../DataSet", dataSetPath, image_size);
+    generateDataSet("../ds2", dataSetPath, image_size);
     return 0;
 
 

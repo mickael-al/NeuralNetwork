@@ -11,6 +11,16 @@
 
 class NeuralNetwork;
 class LinearModel;
+class Rbf;
+
+Rbf* createRbf(size_t nb_poids, double gam, std::vector<std::vector<double>> x, std::vector<double> y);
+typedef Rbf* (*CreateRbf)(size_t, double, std::vector<std::vector<double>>, std::vector<double>);
+
+void releaseRbf(Rbf* rbf);
+typedef void(*ReleaseRbf)(Rbf*);
+
+double predictRbf(Rbf* rbf, double x1, double x2);
+typedef double (*PredictRbf)(Rbf*, double x1, double x2);
 
 LinearModel* createLinearModel();
 typedef LinearModel* (*CreateLinearModel)();

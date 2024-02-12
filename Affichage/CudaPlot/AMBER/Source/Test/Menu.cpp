@@ -34,6 +34,10 @@ void Menu::load()
     m_releaseLinearModel = (ReleaseLinearModel)GetProcAddress(m_hDll, "releaseLinearModel");
     m_trainingLinearModel = (TrainingLinearModel)GetProcAddress(m_hDll, "trainingLinearModel");
     m_predictLinearModel = (PredictLinearModel)GetProcAddress(m_hDll, "predictLinearModel");
+
+    m_createRbf = (CreateRbf)GetProcAddress(m_hDll, "createRbf");
+    m_releaseRbf = (ReleaseRbf)GetProcAddress(m_hDll, "releaseRbf");
+    m_predictRbf = (PredictRbf)GetProcAddress(m_hDll, "predictRbf");
     if (m_createNeuralNetwork == NULL)
     {
         std::cerr << "createNeuralNetwork not found" << std::endl;
@@ -335,11 +339,12 @@ void Menu::render(VulkanMisc* vM)
     ImGui::DragInt("Input layer Size", &(m_nnd.nb_input_layer));
     ImGui::DragInt("Hiden layer Size", &m_nnd.nb_hiden_layer);
     ImGui::DragInt("Hiden Col layer Size", &m_nnd.nb_col_hiden_layer);
-    ImGui::DragInt("Output layer Size", &m_nnd.nb_output_layer);
+    ImGui::DragInt("Output layer Size", &m_nnd.nb_output_layer);    
     if (ImGui::DragScalar("alpha", ImGuiDataType_Double, &m_nnd.alpha) && m_nn != nullptr)
     {
         m_updateNNAlpha(m_nn, m_nnd.alpha);
     }
+    ImGui::DragScalar("gamma", ImGuiDataType_Double, &m_gamma);
     ImGui::Checkbox("is classification", &m_nnd.is_classification);
     ImGui::Text("Training Setting");
     ImGui::DragScalar("minimum percent error train", ImGuiDataType_Double, &m_min_percent_error_train);
@@ -364,7 +369,94 @@ void Menu::render(VulkanMisc* vM)
         ImGui::EndCombo();
     }
 
-
+    if (m_rbf != nullptr)
+    {
+        if (ImGui::Button("Delete rbf"))
+        {
+            m_releaseRbf(m_rbf);
+            m_rbf = nullptr;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Result"))
+        {
+            std::vector<std::vector<double>> data;
+            std::vector<std::vector<double>> result_data;
+            trainingData(&data, &result_data);
+            m_class.clear();
+            m_class.resize(result_data[0].size() + 1);
+            for (int i = 0; i < m_name_class.size(); i++)
+            {
+                delete m_name_class[i];
+            }
+            m_name_class.clear();
+            for (int k = 0; k < m_class.size(); k++)
+            {
+                for (int j = 0; j < data[0].size(); j++)
+                {
+                    m_class[k].push_back({});
+                }
+                m_name_class.push_back(new std::string("Class" + std::to_string(k)));
+            }
+            for (int i = 0; i < data.size(); i++)
+            {
+                int inter = 0;
+                for (int k = 1; k < result_data[i].size(); k++)
+                {
+                    if (result_data[i][inter] < result_data[i][k])
+                    {
+                        inter = k;
+                    }
+                }
+                int Class = result_data[i][inter] > 0 ? inter : result_data[i].size();
+                for (int j = 0; j < data[i].size(); j++)
+                {
+                    m_class[Class][j].push_back(data[i][j]);
+                }
+            }
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Use"))
+        {
+            std::vector<std::vector<double>> data;
+            std::vector<std::vector<double>> result_data;
+            trainingData(&data, &result_data);
+            for (int i = 0; i < result_data.size();i++)
+            {
+                result_data[i][0] = m_predictRbf(m_rbf, data[i][0], data[i][1]);
+            }
+            m_class.clear();
+            m_class.resize(result_data[0].size() + 1);
+            for (int i = 0; i < m_name_class.size(); i++)
+            {
+                delete m_name_class[i];
+            }
+            m_name_class.clear();
+            for (int k = 0; k < m_class.size(); k++)
+            {
+                for (int j = 0; j < data[0].size(); j++)
+                {
+                    m_class[k].push_back({});
+                }
+                m_name_class.push_back(new std::string("Class" + std::to_string(k)));
+            }
+            for (int i = 0; i < data.size(); i++)
+            {
+                int inter = 0;
+                for (int k = 1; k < result_data[i].size(); k++)
+                {
+                    if (result_data[i][inter] < result_data[i][k])
+                    {
+                        inter = k;
+                    }
+                }
+                int Class = result_data[i][inter] > 0 ? inter : result_data[i].size();
+                for (int j = 0; j < data[i].size(); j++)
+                {
+                    m_class[Class][j].push_back(data[i][j]);
+                }
+            }
+        }
+    }
     if (m_lm != nullptr)
     {
         if (ImGui::Button("Delete linear"))
@@ -454,6 +546,19 @@ void Menu::render(VulkanMisc* vM)
             m_lm = m_linearModel();
         }
         ImGui::SameLine();
+        if (ImGui::Button("Create rbf"))
+        {
+            std::vector<std::vector<double>> exemple;            
+            std::vector<std::vector<double>> result;
+            trainingData(&exemple,&result);
+            std::vector<double> r;
+            for (int i = 0; i < result.size(); i++)
+            {
+                r.push_back(result[i][0]);
+            }
+            m_rbf = m_createRbf(m_nnd.nb_hiden_layer, m_gamma, exemple, r);
+        }
+        ImGui::SameLine();        
         if (ImGui::Button("Setup Image"))
         {
             m_nnd.nb_input_layer = 64 * 64 * 3;
